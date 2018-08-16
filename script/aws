@@ -1,0 +1,31 @@
+#!/bin/bash
+set -e
+
+echo "creating AWS-vpc"
+mkdir ~/.aws
+echo $CONFIG > ~/.aws/config
+echo $CREDENTIALS > ~/.aws/credentials
+mkdir aws 
+mkdir aws/cluster
+mkdir cluster && cd cluster
+export AWS_ACCESS_KEY_ID=$AC_ID
+export AWS_SECRET_ACCESS_KEY=$AC_KEY
+export AWS_DEFAULT_REGION=eu-west-2
+export AWS_DEFAULT_OUTPUT=json
+which ssh-keygen
+git clone https://github.com/chandankumar4/test.git
+cd test/k8s/aws/k8s-installer
+echo "creating vpc"
+pip list
+ansible-playbook pre-requisite.yml -vvv
+echo "creating  cluster"
+ansible-playbook create-aws-cluster.yml --extra-vars "k8s_version=1.10.0" -vvv
+wget https://raw.githubusercontent.com/openebs/litmus/master/hack/rbac.yaml
+kubectl apply -f rbac.yaml
+cat /tmp/aws/cluster_name.csv >/itsmesingh.avneet/e2e-infrastructure/aws/cluster/cluster_name.csv
+cat /tmp/aws/id.csv > /itsmesingh.avneet/e2e-infrastructure/aws/cluster/id.csv
+mkdir /itsmesingh.avneet/e2e-infrastructure/.kube
+cat ~/.kube/config > /itsmesingh.avneet/e2e-infrastructure/.kube/config
+kubectl create configmap kubeconfig --from-file=/itsmesingh.avneet/e2e-infrastructure/.kube/config -n litmus
+cd /itsmesingh.avneet/e2e-infrastructure
+mv .kube/config aws/

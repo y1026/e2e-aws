@@ -1,0 +1,19 @@
+#!/bin/bash
+
+set -e
+
+echo "AWS-Cleanup"
+pwd
+ls aws/
+export AWS_ACCESS_KEY_ID=$AC_ID
+export AWS_SECRET_ACCESS_KEY=$AC_KEY
+export AWS_DEFAULT_REGION=eu-west-2
+export AWS_DEFAULT_OUTPUT=json
+mkdir /tmp/aws
+cat aws/cluster/id.csv > /tmp/aws/id.csv
+cat aws/cluster/cluster_name.csv >/tmp/aws/cluster_name.csv
+mkdir cluster && cd cluster
+git clone https://github.com/chandankumar4/test.git
+cd test/k8s/aws/k8s-installer
+ansible-playbook delete-aws-cluster.yml
+ansible-playbook delete-pre-requisite.yml

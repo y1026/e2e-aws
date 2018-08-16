@@ -1,0 +1,44 @@
+stages:
+  - setup
+  - test
+  - app-test
+  - cleanup
+
+aws-cluster:
+  image: atulabhi/kops:v8
+  stage: setup
+  script: 
+    -./script/aws
+
+  artifacts:
+    paths:
+      - aws/
+
+openebs_aws_deploy:
+  image: atulabhi/kops:v8
+  stage: test
+  dependencies:
+    - aws-cluster
+  script: 
+   - echo "deploying OpenEBS on AWS"
+   - ls -a
+   - ls -a aws
+   - pwd
+   - mkdir ~/.kube
+   - cp  aws/config ~/.kube/config
+   - wget https://raw.githubusercontent.com/ashishranjan738/testlit/master/setup_openebs.yaml
+   - kubectl apply -f setup_openebs.yaml
+
+apps-aws-deploy:
+  image: atulabhi/kops:v8
+  stage: app-test
+  script: 
+   - echo "jobs-aws-started"
+
+cleanup-aws:
+  image: atulabhi/kops:v8
+  dependencies:
+    - aws-cluster
+  stage: cleanup
+  script: 
+    - ./script/aws-cleanup
