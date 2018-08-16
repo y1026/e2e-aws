@@ -36,6 +36,7 @@ apps-aws-deploy:
    - echo "jobs-aws-started"
 
 cleanup-aws:
+  when: always
   image: atulabhi/kops:v8
   dependencies:
     - aws-cluster
