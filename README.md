@@ -1,2 +1,3 @@
 # e2e-aws
- This will be used to run e2e pipeline
+This repo contains the script for e2e
+
