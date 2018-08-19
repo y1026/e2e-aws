@@ -8,7 +8,7 @@ aws-cluster:
   image: atulabhi/kops:v8
   stage: setup
   script: 
-    -./script/aws
+    - ./script/aws
 
   artifacts:
     paths:
