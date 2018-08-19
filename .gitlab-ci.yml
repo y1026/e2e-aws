@@ -9,7 +9,7 @@ aws-cluster:
   stage: setup
   script: 
     - pwd
-    -./script/aws
+    - ./script/aws
 
   artifacts:
     paths:
