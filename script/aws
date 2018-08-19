@@ -26,6 +26,6 @@ cat /tmp/aws/cluster_name.csv >/openebs/e2e-aws/cluster/cluster_name.csv
 cat /tmp/aws/id.csv > /openebs/e2e-aws/cluster/id.csv
 mkdir /openebs/e2e-aws/.kube
 cat ~/.kube/config > /openebs/e2e-aws/.kube/config
-kubectl create configmap kubeconfig --from-file=/itsmesingh.avneet/e2e-infrastructure/.kube/config -n litmus
-cd /itsmesingh.avneet/e2e-infrastructure
+kubectl create configmap kubeconfig --from-file=/openebs/e2e-aws/.kube/config -n litmus
+cd /openebs/e2e-aws
 mv .kube/config aws/

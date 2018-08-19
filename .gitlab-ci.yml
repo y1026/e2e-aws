@@ -8,6 +8,7 @@ aws-cluster:
   image: atulabhi/kops:v8
   stage: setup
   script: 
+    - chmod u+x ./script/aws
     - ./script/aws
 
   artifacts:
@@ -42,4 +43,5 @@ cleanup-aws:
     - aws-cluster
   stage: cleanup
   script: 
+    - chmod u+x ./script/aws-cleanup
     - ./script/aws-cleanup
