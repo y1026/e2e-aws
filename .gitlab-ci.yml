@@ -8,7 +8,8 @@ aws-cluster:
   image: atulabhi/kops:v8
   stage: setup
   script: 
-    -./script/aws
+    - chmod u+x ./script/aws
+    - ./script/aws
 
   artifacts:
     paths:
@@ -26,14 +27,16 @@ openebs_aws_deploy:
    - pwd
    - mkdir ~/.kube
    - cp  aws/config ~/.kube/config
-   - wget https://raw.githubusercontent.com/ashishranjan738/testlit/master/setup_openebs.yaml
-   - kubectl apply -f setup_openebs.yaml
+   - https://raw.githubusercontent.com/ashishranjan738/testlit/master/openebsinstaller0.6.yaml
+   - kubectl apply -f openebsinstaller0.6.yaml
 
 apps-aws-deploy:
   image: atulabhi/kops:v8
   stage: app-test
   script: 
    - echo "jobs-aws-started"
+   - wget https://raw.githubusercontent.com/shashank855/litmus/percona_test/apps/percona/deployers/deploy_percona_litmus.yaml
+   - kubectl apply -f deploy_percona_litmus.yaml
 
 cleanup-aws:
   when: always
@@ -42,4 +45,5 @@ cleanup-aws:
     - aws-cluster
   stage: cleanup
   script: 
+    - chmod u+x ./script/aws-cleanup
     - ./script/aws-cleanup
