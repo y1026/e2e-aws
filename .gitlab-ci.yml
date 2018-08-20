@@ -29,6 +29,8 @@ openebs_aws_deploy:
    - cp  aws/.kube/config ~/.kube/config
    - wget https://raw.githubusercontent.com/ashishranjan738/testlit/master/openebsinstaller0.6.yaml
    - kubectl apply -f openebsinstaller0.6.yaml
+   - wget https://raw.githubusercontent.com/ashishranjan738/testlit/master/storageclass_setup.yaml
+   - kubectl apply -f storageclass_setup.yaml
 
 apps-aws-deploy:
   image: atulabhi/kops:v8
@@ -37,7 +39,7 @@ apps-aws-deploy:
    - echo "jobs-aws-started"
    - wget https://raw.githubusercontent.com/shashank855/litmus/percona_test/apps/percona/deployers/deploy_percona_litmus.yaml
    - kubectl apply -f deploy_percona_litmus.yaml
-   - https://raw.githubusercontent.com/ashishranjan738/testlit/master/storageclass_setup.yaml
+   
 
 cleanup-aws:
   when: always
