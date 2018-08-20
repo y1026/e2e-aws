@@ -37,8 +37,8 @@ apps-aws-deploy:
   stage: app-test
   script: 
    - echo "jobs-aws-started"
-   - wget https://raw.githubusercontent.com/shashank855/litmus/percona_test/apps/percona/deployers/deploy_percona_litmus.yaml
-   - kubectl apply -f deploy_percona_litmus.yaml
+   #- wget https://raw.githubusercontent.com/shashank855/litmus/percona_test/apps/percona/deployers/deploy_percona_litmus.yaml
+   #- kubectl apply -f deploy_percona_litmus.yaml
    
 
 cleanup-aws:
