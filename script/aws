@@ -31,4 +31,5 @@ wget https://raw.githubusercontent.com/harshshekhar15/efk-stack/master/playbook/
 wget https://raw.githubusercontent.com/harshshekhar15/efk-stack/master/playbook/efk.yml
 wget https://raw.githubusercontent.com/harshshekhar15/efk-stack/master/playbook/get_url.yml
 ansible-playbook efk.yml --extra-vars "commit_id=$CI_COMMIT_SHA pipeline_id=$CI_PIPELINE_IID" 
+sleep 20
 

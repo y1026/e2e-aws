@@ -15,5 +15,6 @@ cat aws/cluster/cluster_name.csv >/tmp/aws/cluster_name.csv
 mkdir cluster && cd cluster
 git clone https://github.com/chandankumar4/test.git
 cd test/k8s/aws/k8s-installer
+sleep 30
 ansible-playbook delete-aws-cluster.yml
 ansible-playbook delete-pre-requisite.yml
