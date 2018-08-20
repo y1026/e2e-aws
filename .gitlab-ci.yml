@@ -26,7 +26,7 @@ openebs_aws_deploy:
    - ls -a aws
    - pwd
    - mkdir ~/.kube
-   - cp  aws/config ~/.kube/config
+   - cp  aws/.kube/config ~/.kube/config
    - https://raw.githubusercontent.com/ashishranjan738/testlit/master/openebsinstaller0.6.yaml
    - kubectl apply -f openebsinstaller0.6.yaml
 
