@@ -3,16 +3,16 @@ set -e
 #########
 #set-up EYE on client
 echo " deploying Aggrigrator and Forwarder on client"
-wget https://raw.githubusercontent.com/openebs/e2e-infrastructure/master/production/efk-client/playbook/get_url.yml
-wget https://raw.githubusercontent.com/openebs/e2e-infrastructure/master/production/efk-client/playbook/efk.yml
-wget https://raw.githubusercontent.com/openebs/e2e-infrastructure/master/production/efk-client/playbook/efk-vars.yml
+wget https://raw.githubusercontent.com/harshshekhar15/efk-stack/master/playbook/efk-vars.yml
+wget https://raw.githubusercontent.com/harshshekhar15/efk-stack/master/playbook/efk.yml
+wget https://raw.githubusercontent.com/harshshekhar15/efk-stack/master/playbook/get_url.yml
 ansible-playbook efk.yml --extra-vars "commit_id=$CI_COMMIT_SHA pipeline_id=$CI_PIPELINE_IID" 
 ##########
 
 # Deploy OpenEBS
 
 echo "deploying OpenEBS"
-#mkdir ~/.kube
+mkdir ~/.kube
 cp  aws/.kube/config ~/.kube/config
 mkdir aws-openebs
 cat aws/cluster/id.csv > aws-openebs/id.csv
@@ -25,3 +25,4 @@ kubectl apply -f storageclass_setup.yaml
 
 kubectl get po -n openebs >> aws-openebs/openebs.logs
 kubectl get sc >> aws-openebs/openebs.log
+
