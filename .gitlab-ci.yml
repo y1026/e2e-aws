@@ -16,7 +16,7 @@ aws-cluster:
     paths:
       - aws/
 
-openeb-aws-deploy:
+openebs-aws-deploy:
   image: atulabhi/kops:v8
   stage: infra-setup
   dependencies:
@@ -25,6 +25,7 @@ openeb-aws-deploy:
    - echo "deploying OpenEBS on AWS"
    - chmod 775 ./script/infra-setup
    - ./script/infra-setup
+  
   artifacts:
     paths:
       - aws-openebs/
@@ -33,11 +34,15 @@ apps-aws-deploy:
   image: atulabhi/kops:v8
   stage: stateful-apps-deploy
   dependencies:
-    - openebs-aws-deploy:
+    - openebs-aws-deploy
   script: 
    - echo "jobs-aws-started"
    - chmod 775 ./script/stateful-app-deploy
    - ./script/stateful-app-deploy
+
+  artifacts:
+    paths:
+      - aws-openebs/
 
 Litmus-Chaos:
   stage: chaos-test
