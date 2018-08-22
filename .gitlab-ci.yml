@@ -16,7 +16,7 @@ aws-cluster:
     paths:
       - aws/
 
-openebs_aws_deploy:
+openeb-aws-deploy:
   image: atulabhi/kops:v8
   stage: infra-setup
   dependencies:
@@ -25,9 +25,15 @@ openebs_aws_deploy:
    - echo "deploying OpenEBS on AWS"
    - chmod 775 ./script/infra-setup
    - ./script/infra-setup
+  artifacts:
+    paths:
+      - aws-openebs/
+
 apps-aws-deploy:
   image: atulabhi/kops:v8
   stage: stateful-apps-deploy
+  dependencies:
+    - openebs-aws-deploy:
   script: 
    - echo "jobs-aws-started"
    - chmod 775 ./script/stateful-app-deploy

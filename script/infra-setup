@@ -14,10 +14,11 @@ ansible-playbook efk.yml --extra-vars "commit_id=$CI_COMMIT_SHA pipeline_id=$CI_
 echo "deploying OpenEBS"
 mkdir ~/.kube
 cp  aws/.kube/config ~/.kube/config
-cat aws/cluster/id.csv > /tmp/aws/id.csv
-cat aws/cluster/cluster_name.csv >/tmp/aws/cluster_name.csv
-
+mkdir aws-openebs
 wget https://raw.githubusercontent.com/ashishranjan738/testlit/master/openebsinstaller0.6.yaml
 kubectl apply -f openebsinstaller0.6.yaml
 wget https://raw.githubusercontent.com/ashishranjan738/testlit/master/storageclass_setup.yaml
 kubectl apply -f storageclass_setup.yaml
+
+kubectl get po -n openebs >> aws-openebs/openebs.logs
+kubectl get sc >> aws-openebs/openebs.log

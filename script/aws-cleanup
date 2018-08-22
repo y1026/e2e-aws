@@ -3,8 +3,6 @@
 set -e
 
 echo "AWS-Cleanup"
-pwd
-ls aws/
 export AWS_ACCESS_KEY_ID=$AC_ID
 export AWS_SECRET_ACCESS_KEY=$AC_KEY
 export AWS_DEFAULT_REGION=eu-west-2
