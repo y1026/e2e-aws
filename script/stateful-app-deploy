@@ -9,9 +9,9 @@ export AWS_DEFAULT_REGION=eu-west-2
 export AWS_DEFAULT_OUTPUT=json
 mkdir /tmp/aws
 mkdir ~/.kube
-cp  aws/.kube/config ~/.kube/config
-cat aws/cluster/id.csv > /tmp/aws/id.csv
-cat aws/cluster/cluster_name.csv >/tmp/aws/cluster_name.csv
+cp  aws-openebs/config ~/.kube/config
+cat aws-openebs/id.csv > /tmp/aws/id.csv
+cat aws-openebs/cluster_name.csv >/tmp/aws/cluster_name.csv
 
 
 echo "attaching disks"

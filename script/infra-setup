@@ -15,6 +15,9 @@ echo "deploying OpenEBS"
 mkdir ~/.kube
 cp  aws/.kube/config ~/.kube/config
 mkdir aws-openebs
+cat aws/cluster/id.csv > aws-openebs/id.csv
+cat aws/cluster/cluster_name.csv > aws-openebs/cluster_name.csv
+cp aws/.kube/config aws-openebs/
 wget https://raw.githubusercontent.com/ashishranjan738/testlit/master/openebsinstaller0.6.yaml
 kubectl apply -f openebsinstaller0.6.yaml
 wget https://raw.githubusercontent.com/ashishranjan738/testlit/master/storageclass_setup.yaml
