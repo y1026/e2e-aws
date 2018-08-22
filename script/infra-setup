@@ -2,6 +2,8 @@
 set -e
 #########
 #set-up EYE on client
+mkdir ~/.kube
+cp  aws/.kube/config ~/.kube/config
 echo " deploying Aggrigrator and Forwarder on client"
 wget https://raw.githubusercontent.com/harshshekhar15/efk-stack/master/playbook/efk-vars.yml
 wget https://raw.githubusercontent.com/harshshekhar15/efk-stack/master/playbook/efk.yml
@@ -12,8 +14,7 @@ ansible-playbook efk.yml --extra-vars "commit_id=$CI_COMMIT_SHA pipeline_id=$CI_
 # Deploy OpenEBS
 
 echo "deploying OpenEBS"
-#mkdir ~/.kube
-cp  aws/.kube/config ~/.kube/config
+
 mkdir aws-openebs
 cat aws/cluster/id.csv > aws-openebs/id.csv
 cat aws/cluster/cluster_name.csv > aws-openebs/cluster_name.csv
