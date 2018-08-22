@@ -12,7 +12,7 @@ export AWS_DEFAULT_OUTPUT=json
 mkdir /tmp/aws
 cat aws/cluster/id.csv > /tmp/aws/id.csv
 cat aws/cluster/cluster_name.csv >/tmp/aws/cluster_name.csv
-mkdir cluster && cd cluster
+mkdir cluster && cd cluster #remove this with litmus
 git clone https://github.com/chandankumar4/test.git
 cd test/k8s/aws/k8s-installer
 sleep 30

@@ -1,14 +1,15 @@
 stages:
-  - setup
-  - test
-  - app-test
+  - cluster-setup
+  - infra-setup
+  - stateful-apps-deploy
+  - chaos-test
   - cleanup
-
+  - deploy
 aws-cluster:
   image: atulabhi/kops:v8
-  stage: setup
+  stage: cluster-setup
   script: 
-    - chmod u+x ./script/aws
+    - chmod 755 ./script/aws
     - ./script/aws
 
   artifacts:
@@ -17,29 +18,25 @@ aws-cluster:
 
 openebs_aws_deploy:
   image: atulabhi/kops:v8
-  stage: test
+  stage: infra-setup
   dependencies:
     - aws-cluster
   script: 
    - echo "deploying OpenEBS on AWS"
-   - ls -a
-   - ls -a aws
-   - pwd
-   - mkdir ~/.kube
-   - cp  aws/.kube/config ~/.kube/config
-   - wget https://raw.githubusercontent.com/ashishranjan738/testlit/master/openebsinstaller0.6.yaml
-   - kubectl apply -f openebsinstaller0.6.yaml
-   - wget https://raw.githubusercontent.com/ashishranjan738/testlit/master/storageclass_setup.yaml
-   - kubectl apply -f storageclass_setup.yaml
-
+   - chmod 775 ./script/infra-setup
+   - ./script/infra-setup
 apps-aws-deploy:
   image: atulabhi/kops:v8
-  stage: app-test
+  stage: stateful-apps-deploy
   script: 
    - echo "jobs-aws-started"
-   #- wget https://raw.githubusercontent.com/shashank855/litmus/percona_test/apps/percona/deployers/deploy_percona_litmus.yaml
-   #- kubectl apply -f deploy_percona_litmus.yaml
-   
+   - chmod 775 ./script/stateful-app-deploy
+   - ./script/stateful-app-deploy
+
+Litmus-Chaos:
+  stage: chaos-test
+  script:
+   - echo " Introducing Chaos"
 
 cleanup-aws:
   when: always
@@ -48,5 +45,11 @@ cleanup-aws:
     - aws-cluster
   stage: cleanup
   script: 
-    - chmod u+x ./script/aws-cleanup
+    - chmod 755 ./script/aws-cleanup
     - ./script/aws-cleanup
+
+
+deploy:
+  stage: deploy
+  script:
+    - echo "successful"

@@ -1,0 +1,23 @@
+#!/bin/bash
+set -e
+#########
+#set-up EYE on client
+echo " deploying Aggrigrator and Forwarder on client"
+wget https://raw.githubusercontent.com/harshshekhar15/efk-stack/master/playbook/efk-vars.yml
+wget https://raw.githubusercontent.com/harshshekhar15/efk-stack/master/playbook/efk.yml
+wget https://raw.githubusercontent.com/harshshekhar15/efk-stack/master/playbook/get_url.yml
+ansible-playbook efk.yml --extra-vars "commit_id=$CI_COMMIT_SHA pipeline_id=$CI_PIPELINE_IID" 
+##########
+
+# Deploy OpenEBS
+
+echo "deploying OpenEBS"
+mkdir ~/.kube
+cp  aws/.kube/config ~/.kube/config
+cat aws/cluster/id.csv > /tmp/aws/id.csv
+cat aws/cluster/cluster_name.csv >/tmp/aws/cluster_name.csv
+
+wget https://raw.githubusercontent.com/ashishranjan738/testlit/master/openebsinstaller0.6.yaml
+kubectl apply -f openebsinstaller0.6.yaml
+wget https://raw.githubusercontent.com/ashishranjan738/testlit/master/storageclass_setup.yaml
+kubectl apply -f storageclass_setup.yaml

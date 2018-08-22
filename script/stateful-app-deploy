@@ -1,0 +1,24 @@
+#!/bin/bash
+set -e
+
+echo "Deploying statefulapps"
+
+mkdir ~/logs
+cp .kube-openebs/clusters ~/logs
+
+echo "attaching disks"
+
+git clone https://github.com/atulabhi/litmus.git
+
+cd litmus
+
+git checkout v0.7-RC1
+
+git branch
+
+ls
+
+
+ls -a
+
+

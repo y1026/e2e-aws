@@ -27,9 +27,3 @@ cat /tmp/aws/id.csv > /openebs/e2e-aws/aws/cluster/id.csv
 mkdir /openebs/e2e-aws/aws/.kube
 cat ~/.kube/config > /openebs/e2e-aws/aws/.kube/config
 kubectl create configmap kubeconfig --from-file=/openebs/e2e-aws/aws/.kube/config -n litmus
-wget https://raw.githubusercontent.com/harshshekhar15/efk-stack/master/playbook/efk-vars.yml
-wget https://raw.githubusercontent.com/harshshekhar15/efk-stack/master/playbook/efk.yml
-wget https://raw.githubusercontent.com/harshshekhar15/efk-stack/master/playbook/get_url.yml
-ansible-playbook efk.yml --extra-vars "commit_id=$CI_COMMIT_SHA pipeline_id=$CI_PIPELINE_IID" 
-sleep 20
-
