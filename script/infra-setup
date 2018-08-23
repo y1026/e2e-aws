@@ -21,9 +21,10 @@ mkdir aws-openebs/ssh
 cat aws/cluster/id.csv > aws-openebs/id.csv
 cat aws/cluster/cluster_name.csv > aws-openebs/cluster_name.csv
 cp aws/.kube/config aws-openebs/
-wget https://raw.githubusercontent.com/atulabhi/litmus/master/providers/openebs/installers/operator/master/litmusbook/openebs_setup.yaml
+wget https://raw.githubusercontent.com/atulabhi/litmus/v0.7-RC1/providers/openebs/installers/operator/master/litmusbook/openebs_setup.yaml
 kubectl apply -f openebs_setup.yaml
 
+sleep 120
 
 litmus_pod=$(kubectl get pod -a -n litmus --no-headers -o custom-columns=:metadata.name)
 status_cmd='kubectl logs $litmus_pod -n litmus -c ansibletest'
