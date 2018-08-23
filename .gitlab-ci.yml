@@ -47,7 +47,10 @@ apps-aws-deploy:
 Litmus-Chaos:
   stage: chaos-test
   script:
-   - echo " Introducing Chaos"
+   - echo " Introducing-Chaos"
+   - kubectl apply -f https://raw.githubusercontent.com/atulabhi/litmus/v0.7-RC1/apps/percona/chaos/openebs_volume_replica_failure/run_litmus_test.yaml
+   - chmod 755 ./script/chaos
+   - ./script/chaos
 
 cleanup-aws:
   when: always
@@ -58,9 +61,3 @@ cleanup-aws:
   script: 
     - chmod 755 ./script/aws-cleanup
     - ./script/aws-cleanup
-
-
-deploy:
-  stage: deploy
-  script:
-    - echo "successful"
