@@ -45,6 +45,7 @@ apps-aws-deploy:
       - aws-openebs/
 
 Litmus-Chaos:
+  image: atulabhi/kops:v8
   stage: chaos-test
   script:
    - echo " Introducing-Chaos"
