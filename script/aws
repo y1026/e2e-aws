@@ -21,7 +21,7 @@ pip list
 ansible-playbook pre-requisite.yml -v
 echo "creating  cluster"
 ansible-playbook create-aws-cluster.yml --extra-vars "k8s_version=1.10.0" -v
-wget https://raw.githubusercontent.com/atulabhi/litmus/v0.7-RC1/providers/openebs/installers/operator/master/litmusbook/openebs_setup.yaml
+wget https://raw.githubusercontent.com/openebs/litmus/master/hack/rbac.yaml
 kubectl apply -f rbac.yaml
 cat /tmp/aws/cluster_name.csv >/openebs/e2e-aws/aws/cluster/cluster_name.csv
 cat /tmp/aws/id.csv > /openebs/e2e-aws/aws/cluster/id.csv
