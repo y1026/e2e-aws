@@ -36,7 +36,7 @@ apps-aws-deploy:
   dependencies:
     - openebs-aws-deploy
   script: 
-   - echo "jobs-aws-started"
+   - echo "jobs-AWS-started"
    - chmod 775 ./script/stateful-app-deploy
    - ./script/stateful-app-deploy
 
