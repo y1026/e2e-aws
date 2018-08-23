@@ -5,9 +5,9 @@ set -e
 mkdir ~/.kube
 cp  aws/.kube/config ~/.kube/config
 echo " deploying Aggrigrator and Forwarder on client"
-wget https://raw.githubusercontent.com/harshshekhar15/efk-stack/master/playbook/efk-vars.yml
-wget https://raw.githubusercontent.com/harshshekhar15/efk-stack/master/playbook/efk.yml
-wget https://raw.githubusercontent.com/harshshekhar15/efk-stack/master/playbook/get_url.yml
+wget https://raw.githubusercontent.com/openebs/e2e-infrastructure/master/production/efk-client/playbook/efk-vars.yml
+wget https://raw.githubusercontent.com/openebs/e2e-infrastructure/master/production/efk-client/playbook/efk.yml
+wget https://raw.githubusercontent.com/openebs/e2e-infrastructure/master/production/efk-client/playbook/get_url.yml
 ansible-playbook efk.yml --extra-vars "commit_id=$CI_COMMIT_SHA pipeline_id=$CI_PIPELINE_IID" 
 ##########
 
@@ -19,11 +19,9 @@ mkdir aws-openebs
 cat aws/cluster/id.csv > aws-openebs/id.csv
 cat aws/cluster/cluster_name.csv > aws-openebs/cluster_name.csv
 cp aws/.kube/config aws-openebs/
-wget https://raw.githubusercontent.com/ashishranjan738/testlit/master/openebsinstaller0.6.yaml
-kubectl apply -f openebsinstaller0.6.yaml
-wget https://raw.githubusercontent.com/ashishranjan738/testlit/master/storageclass_setup.yaml
-kubectl apply -f storageclass_setup.yaml
+wget https://raw.githubusercontent.com/atulabhi/litmus/master/providers/openebs/installers/operator/master/litmusbook/openebs_setup.yaml
+kubectl apply -f openebs_setup.yaml
 
 kubectl get po -n openebs >> aws-openebs/openebs.logs
-kubectl get sc >> aws-openebs/openebs.log
+
 
