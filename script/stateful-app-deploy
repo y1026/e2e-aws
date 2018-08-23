@@ -32,7 +32,7 @@ cd k8s/aws/ebs-volumes/
 wget https://raw.githubusercontent.com/atulabhi/litmus/v0.7-RC1/providers/openebs/installers/storageclass/0.7/litmusbook/storageclass_setup.yaml
 
 
-kubectl apply -f  storageclass_setup.yaml
+#kubectl apply -f  storageclass_setup.yaml
 
 cd ../../..
 
