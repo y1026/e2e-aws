@@ -17,13 +17,28 @@ echo "deploying OpenEBS"
 
 mkdir aws-openebs
 mkdir aws-openebs/ssh
-cp -r aws/ssh/. aws-openebs/ssh/
+
 cat aws/cluster/id.csv > aws-openebs/id.csv
 cat aws/cluster/cluster_name.csv > aws-openebs/cluster_name.csv
 cp aws/.kube/config aws-openebs/
 wget https://raw.githubusercontent.com/atulabhi/litmus/master/providers/openebs/installers/operator/master/litmusbook/openebs_setup.yaml
 kubectl apply -f openebs_setup.yaml
 
-kubectl get po -n openebs >> aws-openebs/openebs.logs
 
+litmus_pod=$(kubectl get pod -a -n litmus --no-headers -o custom-columns=:metadata.name)
+status_cmd='kubectl logs $litmus_pod -n litmus -c ansibletest'
+while [[ $(kubectl get pod $litmus_pod --no-headers -n litmus -o custom-columns=:status.phase) =~ 'Running' ]]
+do
+   echo "Still Running sir..."
+   sleep 1
+done
+if [[ ! $(eval $status_cmd) =~ 'FAILED!' ]]; then
+   TestStatus='Pass'
+else
+  TestStatus='Fail'
+fi
+echo $TestStatus
 
+echo "========================================================================="
+
+eval $status_cmd
