@@ -40,6 +40,7 @@ kubectl apply -f apps/percona/deployers/deploy_percona_litmus.yaml
 
 litmus_pod=$(kubectl get pod -a -n litmus --no-headers -o custom-columns=:metadata.name)
 status_cmd='kubectl logs $litmus_pod -n litmus -c ansibletest'
+sleep 120
 while [[ $(kubectl get pod $litmus_pod --no-headers -n litmus -o custom-columns=:status.phase) =~ 'Running' ]]
 do
    echo "Still Running sir..."
