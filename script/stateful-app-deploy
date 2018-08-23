@@ -57,7 +57,7 @@ echo "========================================================================="
 
 eval $status_cmd
 
-kubectl get po
+kubectl get po -n litmus
 
 kubectl get sc
 
