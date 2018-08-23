@@ -26,7 +26,8 @@ kubectl apply -f rbac.yaml
 cat /tmp/aws/cluster_name.csv >/openebs/e2e-aws/aws/cluster/cluster_name.csv
 cat /tmp/aws/id.csv > /openebs/e2e-aws/aws/cluster/id.csv
 mkdir /openebs/e2e-aws/aws/.kube
+cat ~/.kube/config > /openebs/e2e-aws/aws/.kube/admin.conf
 cat ~/.kube/config > /openebs/e2e-aws/aws/.kube/config
 ls ~/.ssh
 cp -r ~/.ssh/. /openebs/e2e-aws/aws/ssh
-kubectl create configmap kubeconfig --from-file=/openebs/e2e-aws/aws/.kube/config -n litmus
+kubectl create configmap kubeconfig --from-file=/openebs/e2e-aws/aws/.kube/admin.conf -n litmus
