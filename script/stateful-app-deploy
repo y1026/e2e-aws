@@ -13,6 +13,7 @@ mkdir ~/.kube
 cp  aws-openebs/config ~/.kube/config
 cat aws-openebs/id.csv > /tmp/aws/id.csv
 cat aws-openebs/cluster_name.csv >/tmp/aws/cluster_name.csv
+cp -r aws-openebs/ssh/. ~/.ssh/
 
 
 echo "attaching disks"

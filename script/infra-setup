@@ -16,6 +16,8 @@ ansible-playbook efk.yml --extra-vars "commit_id=$CI_COMMIT_SHA pipeline_id=$CI_
 echo "deploying OpenEBS"
 
 mkdir aws-openebs
+mkdir aws-openebs/ssh
+cp -r aws/ssh/. aws-openebs/ssh/
 cat aws/cluster/id.csv > aws-openebs/id.csv
 cat aws/cluster/cluster_name.csv > aws-openebs/cluster_name.csv
 cp aws/.kube/config aws-openebs/

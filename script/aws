@@ -7,6 +7,7 @@ echo $CONFIG > ~/.aws/config
 echo $CREDENTIALS > ~/.aws/credentials
 mkdir aws 
 mkdir aws/cluster
+mkdir aws/ssh
 mkdir cluster && cd cluster
 export AWS_ACCESS_KEY_ID=$AC_ID
 export AWS_SECRET_ACCESS_KEY=$AC_KEY
@@ -26,4 +27,6 @@ cat /tmp/aws/cluster_name.csv >/openebs/e2e-aws/aws/cluster/cluster_name.csv
 cat /tmp/aws/id.csv > /openebs/e2e-aws/aws/cluster/id.csv
 mkdir /openebs/e2e-aws/aws/.kube
 cat ~/.kube/config > /openebs/e2e-aws/aws/.kube/config
+ls ~/.ssh
+cp -r ~/.ssh/. /openebs/e2e-aws/aws/ssh
 kubectl create configmap kubeconfig --from-file=/openebs/e2e-aws/aws/.kube/config -n litmus
