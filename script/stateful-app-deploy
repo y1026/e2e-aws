@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -ex
 
 echo "Deploying statefulapps"
 
@@ -24,7 +24,7 @@ cd litmus
 
 git checkout v0.7-RC1
 
-cd k8s/aws/ebs-volumes/
+#cd k8s/aws/ebs-volumes/
 
 #cluster=$(cat /tmp/aws/cluster_name.csv | cut -d: -f2)
 #ansible-playbook create-ebs-volume.yml -vv --extra-vars "cluster_name=nodes.k8s-$cluster.k8s.local"
