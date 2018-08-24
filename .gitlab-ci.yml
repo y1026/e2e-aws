@@ -44,6 +44,19 @@ apps-aws-deploy:
     paths:
       - aws-openebs/
 
+apps-aws-deploy-cstor:
+  image: atulabhi/kops:v8
+  stage: stateful-apps-deploy
+  dependencies:
+    - openebs-aws-deploy
+  script: 
+   - echo "jobs-AWS-Started"
+   - chmod 775 ./script/stateful-app-deploy
+   - ./script/stateful-app-deploy-cstor
+  artifacts:
+    paths:
+      - aws-cstor/
+
 Litmus-Chaos:
   image: atulabhi/kops:v8
   dependencies:
@@ -56,6 +69,21 @@ Litmus-Chaos:
    - kubectl create -f https://raw.githubusercontent.com/atulabhi/litmus/v0.7-RC1/apps/percona/chaos/openebs_volume_replica_failure/run_litmus_test.yaml
    - chmod 755 ./script/chaos
    - ./script/chaos
+
+Litmus-Chaos-cstor:
+  image: atulabhi/kops:v8
+  dependencies:
+    - openebs-aws-deploy-cstor
+  stage: chaos-test
+  script:
+   - echo " Introducing-Chaos"
+   - mkdir ~/.kube
+   - cp  aws-openebs/config ~/.kube/config 
+   - https://raw.githubusercontent.com/atulabhi/litmus/cstor-v0.7-RC1/apps/percona/chaos/openebs_cstor_target_failure/run_litmus_test.yaml
+   - chmod 755 ./script/chaoscstor
+   - ./script/chaoscstor
+
+
 
 cleanup-aws:
   when: always

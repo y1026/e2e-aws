@@ -1,10 +1,9 @@
 #!/bin/bash
-
 set -ex
 
 sleep 120
  
-litmus_pod=$(kubectl get pod -a -n litmus --no-headers -o custom-columns=:metadata.name | grep openebs-volume-replica-failure)
+litmus_pod=$(kubectl get pod -a -n litmus --no-headers -o custom-columns=:metadata.name | grep openebs-cstor-target-failure)
 status_cmd='kubectl logs $litmus_pod -n litmus -c ansibletest'
 while [[ $(kubectl get pod $litmus_pod --no-headers -n litmus -o custom-columns=:status.phase) =~ 'Running' ]]
 do
