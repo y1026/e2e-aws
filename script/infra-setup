@@ -8,8 +8,13 @@ echo " deploying Aggrigrator and Forwarder on client"
 wget https://raw.githubusercontent.com/openebs/e2e-infrastructure/master/production/efk-client/playbook/efk-vars.yml
 wget https://raw.githubusercontent.com/openebs/e2e-infrastructure/master/production/efk-client/playbook/efk.yml
 wget https://raw.githubusercontent.com/openebs/e2e-infrastructure/master/production/efk-client/playbook/get_url.yml
-ansible-playbook efk.yml --extra-vars "commit_id=$CI_COMMIT_SHA pipeline_id=$CI_PIPELINE_IID" 
+ansible-playbook efk.yml --extra-vars "commit_id=$CI_COMMIT_SHA pipeline_id=$CI_PIPELINE_ID" 
+
+echo "***************************************"
+echo "Pipeline IDS"
+echo $CI_PIPELINE_ID
 echo $CI_PIPELINE_IID
+echo "***************************************"
 ###########
 
 # Deploy OpenEBS
