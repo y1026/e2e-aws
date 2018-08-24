@@ -73,7 +73,7 @@ Litmus-Chaos:
 Litmus-Chaos-cstor:
   image: atulabhi/kops:v8
   dependencies:
-    - openebs-aws-deploy-cstor
+    - openebs-aws-deploy
   stage: chaos-test
   script:
    - echo " Introducing-Chaos"
