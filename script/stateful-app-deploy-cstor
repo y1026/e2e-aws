@@ -24,7 +24,7 @@ git checkout cstor-v0.7-RC1
 
 echo "Deploying storage-class"
 
-kubectl apply -f  litmus/providers/openebs/installers/storageclass/0.7/litmusbook/storageclass_setup.yaml
+kubectl apply -f  providers/openebs/installers/storageclass/0.7/litmusbook/storageclass_setup.yaml
 
 kubectl get sc
 
