@@ -29,7 +29,7 @@ kubectl apply -f  providers/openebs/installers/storageclass/0.7/litmusbook/stora
 kubectl get sc
 
 echo "deploying percona app"
-kubectl apply -f litmus/apps/percona/deployers/deploy_percona_litmus.yaml
+kubectl apply -f apps/percona/deployers/deploy_percona_litmus.yaml
 
 kubectl get pods -n percona
 
