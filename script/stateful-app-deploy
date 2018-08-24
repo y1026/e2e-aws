@@ -61,4 +61,4 @@ kubectl get po -n litmus
 
 kubectl get sc
 
-kubectl get sp
+#kubectl get sp
