@@ -51,7 +51,7 @@ apps-aws-deploy-cstor:
     - openebs-aws-deploy
   script: 
    - echo "jobs-AWS-Started"
-   - chmod 775 ./script/stateful-app-deploy
+   - chmod 775 ./script/stateful-app-deploy-cstor
    - ./script/stateful-app-deploy-cstor
   artifacts:
     paths:
