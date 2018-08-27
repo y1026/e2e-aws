@@ -2,7 +2,7 @@ stages:
   - cluster-setup
   - infra-setup
   - stateful-apps-deploy
-  - chaos-test
+  - Litmus-chaos-testing
   - cleanup
   - deploy
 aws-cluster:
@@ -61,7 +61,7 @@ Litmus-Chaos:
   image: atulabhi/kops:v8
   dependencies:
     - openebs-aws-deploy
-  stage: chaos-test
+  stage: Litmus-chaos-testing
   script:
    - echo " Introducing-Chaos"
    - mkdir ~/.kube
@@ -74,7 +74,7 @@ Litmus-Chaos-cstor:
   image: atulabhi/kops:v8
   dependencies:
     - openebs-aws-deploy
-  stage: chaos-test
+  stage: Litmus-chaos-testing
   script:
    - echo " Introducing-Chaos"
    - mkdir ~/.kube
