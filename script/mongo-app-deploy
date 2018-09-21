@@ -8,8 +8,8 @@
 ## TODO: Ideally, run_metadata should be passed as gitlab runner (CI runtime) ENV
 run_metadata=""
 
-## https://github.com/openebs/litmus/blob/master/apps/percona/deployers/percona_vars.yaml
-test_name="percona-deployment" 
+## https://github.com/openebs/litmus/blob/master/apps/mongodb/deployers/test_vars.yml
+test_name="mongodb-deployment" 
 
 if [[ -n "$run_metadata" ]]; then
   test_name="$test_name-$run_metadata"
@@ -68,16 +68,16 @@ task_delimiter;
 
 echo "Running the litmus test.."
 
-## Create the litmus job for percona app deploy
+## Create the litmus job for mongo app deploy
 
-job_deploy_out=$(kubectl create -f apps/percona/deployers/deploy_percona_litmus.yaml) && \
+job_deploy_out=$(kubectl create -f apps/mongodb/deployers/deploy_mongodb_litmus.yml) && \
 job_name=$(echo $job_deploy_out | awk '{print $2}'| sed -e 's/"//g'); retcode=$?
 error_handler $retcode msg="Unable to run litmusbook, exiting" action="exit"
 
 ## Obtain the litmus pod name 
 
 ## TODO: Consider cases where K8s version changes (job creation stdout changes)
-## Opting against kubectl get jobs -l <litmus-percona-label> -o custom-columns to guard against existing jobs 
+## Opting against kubectl get jobs -l <litmus-mongo-label> -o custom-columns to guard against existing jobs 
 
 litmusPodCmd="kubectl get pod --no-headers -n litmus -o jsonpath='{.items[?(@.metadata.labels.job-name==\"$job_name\")].metadata.name}'"
 litmus_pod=$(eval $litmusPodCmd); retcode=$?

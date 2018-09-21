@@ -5,6 +5,7 @@ stages:
   - chaos-test
   - cleanup
   - deploy
+
 aws-cluster:
   image: atulabhi/kops:v8
   stage: cluster-setup
@@ -30,15 +31,29 @@ openebs-aws-deploy:
     paths:
       - aws-openebs/
 
-apps-aws-deploy:
+percona-aws-deploy:
   image: atulabhi/kops:v8
   stage: stateful-apps-deploy
   dependencies:
     - openebs-aws-deploy
   script: 
-   - echo "jobs-AWS-Started"
-   - chmod 775 ./script/stateful-app-deploy
-   - ./script/stateful-app-deploy
+   #- echo "jobs-AWS-Started"
+   - chmod 775 ./script/percona-app-deploy
+   - ./script/percona-app-deploy
+
+  artifacts:
+    paths:
+      - aws-openebs/
+
+mongo-aws-deploy:
+  image: atulabhi/kops:v8
+  stage: stateful-apps-deploy
+  dependencies:
+    - openebs-aws-deploy
+  script: 
+   #- echo "jobs-AWS-Started"
+   - chmod 775 ./script/mongo-app-deploy
+   - ./script/mongo-app-deploy
 
   artifacts:
     paths:
