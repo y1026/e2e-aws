@@ -1,5 +1,5 @@
 #!/bin/bash
-# set -e
+set -x
 
 #################
 ## ENVIRONMENT ##
@@ -70,14 +70,14 @@ echo "Running the litmus test.."
 
 ## Create the litmus job for mongo app deploy
 
-job_deploy_out=$(kubectl create -f apps/mongodb/deployers/deploy_mongodb_litmus.yml) && \
-job_name=$(echo $job_deploy_out | awk '{print $2}'| sed -e 's/"//g'); retcode=$?
+jobNameCmd="kubectl get jobs -n litmus --no-headers -o jsonpath='{.items[?(@.metadata.labels.app==\"mongodb-deployment-litmus\")].metadata.name}'"
+
+job_deploy_out=$(kubectl create -f apps/mongodb/deployers/run_litmus_test.yaml) && \
+job_name=$(eval $jobNameCmd); retcode=$?
 error_handler $retcode msg="Unable to run litmusbook, exiting" action="exit"
 
-## Obtain the litmus pod name 
 
-## TODO: Consider cases where K8s version changes (job creation stdout changes)
-## Opting against kubectl get jobs -l <litmus-mongo-label> -o custom-columns to guard against existing jobs 
+## Obtain the litmus pod name 
 
 litmusPodCmd="kubectl get pod --no-headers -n litmus -o jsonpath='{.items[?(@.metadata.labels.job-name==\"$job_name\")].metadata.name}'"
 litmus_pod=$(eval $litmusPodCmd); retcode=$?
