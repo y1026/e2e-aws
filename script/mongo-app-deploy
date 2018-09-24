@@ -72,7 +72,7 @@ echo "Running the litmus test.."
 
 jobNameCmd="kubectl get jobs -n litmus --no-headers -o jsonpath='{.items[?(@.metadata.labels.app==\"mongodb-deployment-litmus\")].metadata.name}'"
 
-job_deploy_out=$(kubectl create -f apps/mongodb/deployers/run_litmus_test.yaml) && \
+job_deploy_out=$(kubectl create -f apps/mongodb/deployers/run_litmus_test.yml) && \
 job_name=$(eval $jobNameCmd); retcode=$?
 error_handler $retcode msg="Unable to run litmusbook, exiting" action="exit"
 

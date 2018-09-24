@@ -8,8 +8,8 @@ set -x
 ## TODO: Ideally, run_metadata should be passed as gitlab runner (CI runtime) ENV
 run_metadata=""
 
-## https://github.com/openebs/litmus/blob/master/apps/percona/deployers/test_vars.yml
-test_name="percona-deployment" 
+## https://github.com/openebs/litmus/blob/master/apps/percona/chaos/openebs_volume_replica_failure/test_vars.yml
+test_name="openebs-volume-replica-failure" 
 
 if [[ -n "$run_metadata" ]]; then
   test_name="$test_name-$run_metadata"
@@ -68,11 +68,11 @@ task_delimiter;
 
 echo "Running the litmus test.."
 
-## Create the litmus job for percona app deploy
+## Create the litmus job for percona app chaos test: openebs-volume-replica-failure
 
-jobNameCmd="kubectl get jobs -n litmus --no-headers -o jsonpath='{.items[?(@.metadata.labels.app==\"percona-deployment\")].metadata.name}'"
+jobNameCmd="kubectl get jobs -n litmus --no-headers -o jsonpath='{.items[?(@.metadata.labels.name==\"openebs-volume-replica-failure\")].metadata.name}'"
 
-job_deploy_out=$(kubectl create -f apps/percona/deployers/run_litmus_test.yml) && \
+job_deploy_out=$(kubectl create -f apps/percona/chaos/openebs_volume_replica_failure/run_litmus_test.yml) && \
 job_name=$(eval $jobNameCmd); retcode=$?
 error_handler $retcode msg="Unable to run litmusbook, exiting" action="exit"
 
