@@ -17,7 +17,7 @@ aws-cluster:
     paths:
       - aws/
 
-openebs-aws:
+openebs-aws-deploy:
   image: atulabhi/kops:v8
   stage: infra-setup
   dependencies:
