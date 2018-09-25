@@ -106,7 +106,7 @@ jenkins-jiva:
 Litmus-Chaos:
   image: atulabhi/kops:v8
   dependencies:
-    - percona-aws
+    - percona-jiva
   stage: chaos-test
   script:
    - chmod 775 ./script/app-chaos
