@@ -31,7 +31,7 @@ openebs-aws-deploy:
     paths:
       - aws-openebs/
 
-percona-aws-deploy:
+percona-jiva:
   image: atulabhi/kops:v8
   stage: stateful-apps-deploy
   dependencies:
@@ -45,7 +45,7 @@ percona-aws-deploy:
     paths:
       - aws-openebs/
 
-mongo-aws-deploy:
+mongo-jiva:
   image: atulabhi/kops:v8
   stage: stateful-apps-deploy
   dependencies:
@@ -59,7 +59,7 @@ mongo-aws-deploy:
     paths:
       - aws-openebs/
 
-postgres-aws-deploy:
+postgres-jiva:
   image: atulabhi/kops:v8
   stage: stateful-apps-deploy
   dependencies:
@@ -74,7 +74,7 @@ postgres-aws-deploy:
       - aws-openebs/
 
 
-cassandra-aws-deploy:
+cassandra-jiva:
   image: atulabhi/kops:v8
   stage: stateful-apps-deploy
   dependencies:
@@ -89,7 +89,7 @@ cassandra-aws-deploy:
       - aws-openebs/
 
 
-jenkins-aws-deploy:
+jenkins-jiva:
   image: atulabhi/kops:v8
   stage: stateful-apps-deploy
   dependencies:
@@ -106,7 +106,7 @@ jenkins-aws-deploy:
 Litmus-Chaos:
   image: atulabhi/kops:v8
   dependencies:
-    - percona-aws-deploy
+    - percona-jiva
   stage: chaos-test
   script:
    - chmod 775 ./script/app-chaos
