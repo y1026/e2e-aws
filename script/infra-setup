@@ -80,7 +80,7 @@ task_delimiter;
 
 echo "Running litmus test for openebs deploy.."
 
-jobNameCmd="kubectl get jobs -n litmus --no-headers -o jsonpath='{.items[?(@.metadata.labels.name==\"openebs-setup\")].metadata.name}'"
+jobNameCmd="kubectl get jobs -n litmus --no-headers -o jsonpath='{.items[?(@.metadata.labels.provider==\"openebs-setup\")].metadata.name}'"
 
 job_deploy_out=$(kubectl create -f providers/openebs/installers/operator/master/litmusbook/openebs_setup.yaml) && \
 job_name=$(eval $jobNameCmd); retcode=$?
