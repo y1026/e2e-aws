@@ -1,3 +1,5 @@
+## TODO: Modularize the gitlab yaml to reuse templates
+
 stages:
   - cluster-setup
   - infra-setup
@@ -10,7 +12,6 @@ aws-cluster:
   image: atulabhi/kops:v8
   stage: cluster-setup
   script: 
-    - chmod 755 ./script/aws
     - ./script/aws
 
   artifacts:
@@ -24,8 +25,7 @@ openebs-aws-deploy:
     - aws-cluster
   script: 
    - echo "deploying OpenEBS on AWS"
-   - chmod 775 ./script/infra-setup
-   - ./script/infra-setup
+   - ./script/provider/infra-setup
   
   artifacts:
     paths:
@@ -37,9 +37,7 @@ percona-jiva:
   dependencies:
     - openebs-aws-deploy
   script: 
-   #- echo "jobs-AWS-Started"
-   - chmod 775 ./script/percona-app-deploy
-   - ./script/percona-app-deploy
+   - ./script/apps/percona/deployer/percona-app-deploy-jiva
 
   artifacts:
     paths:
@@ -51,9 +49,7 @@ mongo-jiva:
   dependencies:
     - openebs-aws-deploy
   script: 
-   #- echo "jobs-AWS-Started"
-   - chmod 775 ./script/mongo-app-deploy
-   - ./script/mongo-app-deploy
+   - ./script/apps/mongo/deployer/mongo-app-deploy-jiva
 
   artifacts:
     paths:
@@ -65,14 +61,11 @@ postgres-jiva:
   dependencies:
     - openebs-aws-deploy
   script: 
-   #- echo "jobs-AWS-Started"
-   - chmod 775 ./script/postgres-app-deploy
-   - ./script/postgres-app-deploy
+   - ./script/apps/postgres/deployer/postgres-app-deploy-jiva
 
   artifacts:
     paths:
       - aws-openebs/
-
 
 cassandra-jiva:
   image: atulabhi/kops:v8
@@ -80,14 +73,11 @@ cassandra-jiva:
   dependencies:
     - openebs-aws-deploy
   script: 
-   #- echo "jobs-AWS-Started"
-   - chmod 775 ./script/cassandra-app-deploy
-   - ./script/cassandra-app-deploy
+   - ./script/apps/cassandra/deployer/cassandra-app-deploy-jiva
 
   artifacts:
     paths:
       - aws-openebs/
-
 
 jenkins-jiva:
   image: atulabhi/kops:v8
@@ -95,22 +85,91 @@ jenkins-jiva:
   dependencies:
     - openebs-aws-deploy
   script: 
-   #- echo "jobs-AWS-Started"
-   - chmod 775 ./script/jenkins-app-deploy
-   - ./script/jenkins-app-deploy
+   - ./script/apps/jenkins/deployer/jenkins-app-deploy-jiva
 
   artifacts:
     paths:
       - aws-openebs/
 
-Litmus-Chaos:
+percona-cstor:
+  image: atulabhi/kops:v8
+  stage: stateful-apps-deploy
+  dependencies:
+    - openebs-aws-deploy
+  script: 
+   - ./script/apps/percona/deployer/percona-app-deploy-cstor
+
+  artifacts:
+    paths:
+      - aws-openebs/
+
+jiva-replica-failure:
   image: atulabhi/kops:v8
   dependencies:
     - percona-jiva
   stage: chaos-test
   script:
-   - chmod 775 ./script/app-chaos
-   - ./script/app-chaos
+   - ./script/apps/percona/chaos/jiva/volume-replica-failure
+
+  artifacts:
+    paths:
+      - aws-openebs/
+
+jiva-controller-failure:
+  image: atulabhi/kops:v8
+  dependencies:
+    - jiva-replica-failure
+  stage: chaos-test
+  script:
+   - ./script/apps/percona/chaos/jiva/volume-controller-failure
+
+  artifacts:
+    paths:
+      - aws-openebs/
+
+jiva-replica-nw-delay:
+  image: atulabhi/kops:v8
+  dependencies:
+    - jiva-controller-failure
+  stage: chaos-test
+  script:
+   - ./script/apps/percona/chaos/jiva/volume-replica-network-delay
+
+  artifacts:
+    paths:
+      - aws-openebs/
+
+jiva-controller-nw-delay:
+  image: atulabhi/kops:v8
+  dependencies:
+    - jiva-replica-nw-delay
+  stage: chaos-test
+  script:
+   - ./script/apps/percona/chaos/jiva/volume-controller-network-delay
+
+  artifacts:
+    paths:
+      - aws-openebs/
+
+cstor-target-failure:
+  image: atulabhi/kops:v8
+  dependencies:
+    - percona-cstor
+  stage: chaos-test
+  script:
+   - ./script/apps/percona/chaos/cstor/volume-target-failure
+
+  artifacts:
+    paths:
+      - aws-openebs/
+
+cstor-target-nw-delay:
+  image: atulabhi/kops:v8
+  dependencies:
+    - cstor-target-failure
+  stage: chaos-test
+  script:
+   - ./script/apps/percona/chaos/cstor/volume-target-network-delay
 
   artifacts:
     paths:
