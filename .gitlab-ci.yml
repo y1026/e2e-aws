@@ -115,41 +115,41 @@ jiva-replica-failure:
     paths:
       - aws-openebs/
 
-jiva-controller-failure:
-  image: atulabhi/kops:v8
-  dependencies:
-    - jiva-replica-failure
-  stage: chaos-test
-  script:
-   - ./script/apps/percona/chaos/jiva/volume-controller-failure
+#jiva-controller-failure:
+#  image: atulabhi/kops:v8
+#  dependencies:
+#    - jiva-replica-failure
+#  stage: chaos-test
+#  script:
+#   - ./script/apps/percona/chaos/jiva/volume-controller-failure
 
-  artifacts:
-    paths:
-      - aws-openebs/
+#  artifacts:
+#    paths:
+#      - aws-openebs/
 
-jiva-replica-nw-delay:
-  image: atulabhi/kops:v8
-  dependencies:
-    - jiva-controller-failure
-  stage: chaos-test
-  script:
-   - ./script/apps/percona/chaos/jiva/volume-replica-network-delay
+#jiva-replica-nw-delay:
+#  image: atulabhi/kops:v8
+#  dependencies:
+#    - jiva-controller-failure
+#  stage: chaos-test
+#  script:
+#   - ./script/apps/percona/chaos/jiva/volume-replica-network-delay
 
-  artifacts:
-    paths:
-      - aws-openebs/
+#  artifacts:
+#    paths:
+#      - aws-openebs/
 
-jiva-controller-nw-delay:
-  image: atulabhi/kops:v8
-  dependencies:
-    - jiva-replica-nw-delay
-  stage: chaos-test
-  script:
-   - ./script/apps/percona/chaos/jiva/volume-controller-network-delay
+#jiva-controller-nw-delay:
+#  image: atulabhi/kops:v8
+#  dependencies:
+#    - jiva-replica-nw-delay
+#  stage: chaos-test
+#  script:
+#   - ./script/apps/percona/chaos/jiva/volume-controller-network-delay
 
-  artifacts:
-    paths:
-      - aws-openebs/
+#  artifacts:
+#    paths:
+#      - aws-openebs/
 
 cstor-target-failure:
   image: atulabhi/kops:v8
@@ -163,17 +163,17 @@ cstor-target-failure:
     paths:
       - aws-openebs/
 
-cstor-target-nw-delay:
-  image: atulabhi/kops:v8
-  dependencies:
-    - cstor-target-failure
-  stage: chaos-test
-  script:
-   - ./script/apps/percona/chaos/cstor/volume-target-network-delay
+#cstor-target-nw-delay:
+#  image: atulabhi/kops:v8
+#  dependencies:
+#    - cstor-target-failure
+#  stage: chaos-test
+#  script:
+#   - ./script/apps/percona/chaos/cstor/volume-target-network-delay
 
-  artifacts:
-    paths:
-      - aws-openebs/
+#  artifacts:
+#    paths:
+#      - aws-openebs/
 
 cleanup-aws:
   when: always
