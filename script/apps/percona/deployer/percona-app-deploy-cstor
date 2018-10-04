@@ -70,7 +70,7 @@ task_delimiter;
  | specAttribute        | kind	   | jiva       	| cStor-sparse  	       |
   ------------------------------------------------------------------------------------
  | litmusJobLabel       | jobSpec  | percona-deployment | percona-deployment-cstor     |
- | providerStorageClass | env 	   | openebs-standard   | openebs-cstor-default-sparse |
+ | providerStorageClass | env 	   | openebs-standard   | openebs-cstor-sparse         |
  | appNamespace         | env	   | litmus             | percona-cstor                |
  | runID		| env(add) | 	-		| cstor 
   ------------------------------------------------------------------------------------
@@ -78,7 +78,7 @@ EOF
 
 cp apps/percona/deployers/run_litmus_test.yml run_cstor_litmus_test.yml
 sed -i -e 's/app: percona-deployment/app: percona-deployment-cstor/g' \
--e 's/value: openebs-standard/value: openebs-cstor-default-sparse/g' \
+-e 's/value: openebs-standard/value: openebs-cstor-sparse/g' \
 -e 's/value: litmus/value: percona-cstor/g' run_cstor_litmus_test.yml
 
 sed -i '/command:/i \
