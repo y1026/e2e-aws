@@ -75,7 +75,7 @@ task_delimiter;
   ----------------------------------------------------------------------------------
 EOF
 
-cp apps/percona/chaos/openebs_replica_network_delay/run_litmus_test.yml run_jenkins_jiva_network_delay.yml
+cp apps/percona/chaos/openebs_replica_network_delay/run_litmus_test.yml run_jenkins_jiva_rep_network_delay.yml
 
 sed -i -e 's/''name=percona''/''app=jenkins-app''/g' \
 -e 's/value: percona-mysql-claim/value: jenkins-claim/g' run_jenkins_jiva_rep_network_delay.yml

@@ -71,14 +71,14 @@ task_delimiter;
  | specAttribute        | kind     | percona             | mongodb                  |
   ----------------------------------------------------------------------------------|
  | appLabel             | env      | name=percona        | app=mongo                |
- | pvcName              | env      | percona-mysql-claim | openebs-mongodb-mongo-0  | 
+ | pvcName              | env      | percona-mysql-claim | openebs-mongo-mongo-0  | 
   ----------------------------------------------------------------------------------
 EOF
 
 cp apps/percona/chaos/openebs_target_failure/run_litmus_test.yml run_mongo_jiva_controller_failure.yml
 
 sed -i -e 's/''name=percona''/''app=mongo''/g' \
--e 's/value: percona-mysql-claim/value: openebs-mongodb-mongo-0/g' run_mongo_jiva_controller_failure.yml
+-e 's/value: percona-mysql-claim/value: openebs-mongo-mongo-0/g' run_mongo_jiva_controller_failure.yml
 
 
 #################

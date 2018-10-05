@@ -70,7 +70,7 @@ task_delimiter;
  | specAttribute        | kind	   | jiva       		| cStor-sparse  	  |
   ----------------------------------------------------------------------------------------
  | litmusJobLabel       | jobSpec  | mongodb-deployment-litmus  | mongodb-deployment-cstor|     
- | providerStorageClass | env 	   | openebs-standard   	| openebs-cstor-sparse    |
+ | providerStorageClass | env 	   | openebs-mongodb     	| openebs-cstor-sparse    |
  | appNamespace         | env	   | litmus             	| mongodb-cstor           |
  | runID		| env(add) | 	-			| cstor                   |
   ----------------------------------------------------------------------------------------
