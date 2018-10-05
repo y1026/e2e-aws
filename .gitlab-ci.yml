@@ -103,17 +103,17 @@ percona-cstor:
     paths:
       - aws-openebs/
 
-mongo-cstor:
-  image: atulabhi/kops:v8
-  stage: stateful-apps-deploy
-  dependencies:
-    - openebs-aws-deploy
-  script: 
-   - ./script/apps/mongo/deployer/mongo-app-deploy-cstor
+#mongo-cstor:
+#  image: atulabhi/kops:v8
+#  stage: stateful-apps-deploy
+#  dependencies:
+#    - openebs-aws-deploy
+#  script: 
+#   - ./script/apps/mongo/deployer/mongo-app-deploy-cstor
 
-  artifacts:
-    paths:
-      - aws-openebs/
+#  artifacts:
+#    paths:
+#      - aws-openebs/
 
 jiva-rep-kill(percona):
   image: atulabhi/kops:v8
@@ -175,17 +175,17 @@ cstor-tgt-kill(percona):
     paths:
       - aws-openebs/
 
-cstor-tgt-n/w-loss(mongo):
-  image: atulabhi/kops:v8
-  dependencies:
-    - mongo-cstor
-  stage: chaos-test
-  script:
-   - ./script/apps/mongo/chaos/cstor/volume-target-network-delay
+#cstor-tgt-n/w-loss(mongo):
+#  image: atulabhi/kops:v8
+#  dependencies:
+#    - mongo-cstor
+#  stage: chaos-test
+#  script:
+#   - ./script/apps/mongo/chaos/cstor/volume-target-network-delay
 
-  artifacts:
-    paths:
-      - aws-openebs/
+#  artifacts:
+#    paths:
+#      - aws-openebs/
 
 cleanup-aws:
   when: always
