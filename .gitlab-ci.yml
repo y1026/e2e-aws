@@ -115,7 +115,7 @@ mongo-cstor:
     paths:
       - aws-openebs/
 
-jiva-replica-failure(percona):
+jiva-rep-kill(percona):
   image: atulabhi/kops:v8
   dependencies:
     - percona-jiva
@@ -127,7 +127,7 @@ jiva-replica-failure(percona):
     paths:
       - aws-openebs/
 
-jiva-controller-failure(mongo):
+jiva-ctrl-kill(mongo):
   image: atulabhi/kops:v8
   dependencies:
     - mongo-jiva
@@ -139,7 +139,7 @@ jiva-controller-failure(mongo):
     paths:
       - aws-openebs/
 
-jiva-replica-nw-delay(jenkins):
+jiva-rep-n/w-loss(jenkins):
   image: atulabhi/kops:v8
   dependencies:
     - jenkins-jiva
@@ -151,7 +151,7 @@ jiva-replica-nw-delay(jenkins):
     paths:
       - aws-openebs/
 
-jiva-controller-nw-delay(postgres):
+jiva-ctrl-n/w-loss(postgres):
   image: atulabhi/kops:v8
   dependencies:
     - postgres-jiva
@@ -163,7 +163,7 @@ jiva-controller-nw-delay(postgres):
     paths:
       - aws-openebs/
 
-cstor-target-failure(percona):
+cstor-tgt-kill(percona):
   image: atulabhi/kops:v8
   dependencies:
     - percona-cstor
@@ -175,7 +175,7 @@ cstor-target-failure(percona):
     paths:
       - aws-openebs/
 
-cstor-target-nw-delay(mongo):
+cstor-tgt-n/w-loss(mongo):
   image: atulabhi/kops:v8
   dependencies:
     - mongo-cstor

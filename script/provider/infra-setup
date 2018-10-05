@@ -62,8 +62,11 @@ ansible-playbook efk.yml --extra-vars "commit_id=$CI_COMMIT_SHA pipeline_id=$CI_
 
 ## Clone the litmus repo, checkout the e2e branch, navigate to litmus root 
 
-git clone https://github.com/atulabhi/litmus.git
-cd litmus; git checkout v0.7-RC1
+#git clone https://github.com/atulabhi/litmus.git
+#cd litmus; git checkout v0.7-RC1
+
+git clone https://github.com/openebs/litmus.git
+cd litmus
 
 task_delimiter;
 
