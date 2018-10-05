@@ -6,7 +6,7 @@ set -x
 #################
 
 ## TODO: Ideally, run_metadata should be passed as gitlab runner (CI runtime) ENV
-run_metadata=""
+run_metadata="cstor"
 
 ## https://github.com/openebs/litmus/blob/master/apps/percona/chaos/openebs_target_network_delay/test_vars.yml
 test_name="openebs-target-network-delay" 
@@ -65,6 +65,30 @@ task_delimiter;
 ## TODO: Add logic to replace job ENV (SC, PVC, LABEL, NS) based on run instance intent 
 ## TODO: Add logic to add ENV for run_instance_metadata/RunID
 
+: << EOF
+  ---------------------------------------------------------------------------------------------------
+ | specAttribute        | kind     | jiva                         | cStor-sparse                      |
+  --------------------------------------------------------------------------------------------------- |
+ | litmusJobLabel       | jobSpec  | openebs-target-network-delay | openebs-target-network-delay-cstor|
+ | appNamespace         | env      | litmus                       | mongodb-cstor                     |
+ | pvcName              | env      | percona-mysql-claim          | openebs-mongodb-mongo-0           | 
+ | appLabel             | env      | name=percona                 | app=mongo          | 
+ | runID                | env(add) |    -                         | cstor                             | 
+  ----------------------------------------------------------------------------------------------------
+EOF
+
+cp apps/percona/chaos/openebs_target_network_delay/run_litmus_test.yml run_mongo_cstor_ctrl_network_delay.yml
+
+sed -i -e 's/name: openebs-target-network-delay/name: openebs-target-network-delay-cstor/g' \
+-e 's/value: litmus/value: mongodb-cstor/g' \
+-e 's/value: percona-mysql-claim/value: openebs-mongodb-mongo-0/g' \
+-e 's/''name=percona''/''app=mongo''/g' run_mongo_cstor_ctrl_network_delay.yml
+
+sed -i '/command:/i \
+          - name: RUN_ID\
+            value: '"$run_metadata"'\
+' run_mongo_cstor_ctrl_network_delay.yml
+
 #################
 ## RUNNER MAIN ##
 #################
@@ -73,9 +97,9 @@ echo "Running the litmus test.."
 
 ## Create the litmus job for percona app chaos test: openebs-target-network-delay
 
-jobNameCmd="kubectl get jobs -n litmus --no-headers -o jsonpath='{.items[?(@.metadata.labels.name==\"openebs-target-network-delay\")].metadata.name}'"
+jobNameCmd="kubectl get jobs -n litmus --no-headers -o jsonpath='{.items[?(@.metadata.labels.name==\"openebs-target-network-delay-cstor\")].metadata.name}'"
 
-job_deploy_out=$(kubectl create -f apps/percona/chaos/openebs_target_network_delay/run_litmus_test.yml) && \
+job_deploy_out=$(kubectl create -f run_mongo_cstor_ctrl_network_delay.yml) && \
 job_name=$(eval $jobNameCmd); retcode=$?
 error_handler $retcode msg="Unable to run litmusbook, exiting" action="exit"
 

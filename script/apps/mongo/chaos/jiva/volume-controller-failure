@@ -64,6 +64,22 @@ task_delimiter;
 
 ## TODO: Add logic to replace job ENV (SC, PVC, LABEL, NS) based on run instance intent 
 ## TODO: Add logic to add ENV for run_instance_metadata/RunID
+## TODO: Change location of chaos jobs
+
+: << EOF
+  ----------------------------------------------------------------------------------
+ | specAttribute        | kind     | percona             | mongodb                  |
+  ----------------------------------------------------------------------------------|
+ | appLabel             | env      | name=percona        | app=mongo                |
+ | pvcName              | env      | percona-mysql-claim | openebs-mongodb-mongo-0  | 
+  ----------------------------------------------------------------------------------
+EOF
+
+cp apps/percona/chaos/openebs_target_failure/run_litmus_test.yml run_mongo_jiva_controller_failure.yml
+
+sed -i -e 's/''name=percona''/''app=mongo''/g' \
+-e 's/value: percona-mysql-claim/value: openebs-mongodb-mongo-0/g' run_mongo_jiva_controller_failure.yml
+
 
 #################
 ## RUNNER MAIN ##
@@ -75,7 +91,7 @@ echo "Running the litmus test.."
 
 jobNameCmd="kubectl get jobs -n litmus --no-headers -o jsonpath='{.items[?(@.metadata.labels.name==\"openebs-target-failure\")].metadata.name}'"
 
-job_deploy_out=$(kubectl create -f apps/percona/chaos/openebs_target_failure/run_litmus_test.yml) && \
+job_deploy_out=$(kubectl create -f run_mongo_jiva_controller_failure.yml) && \
 job_name=$(eval $jobNameCmd); retcode=$?
 error_handler $retcode msg="Unable to run litmusbook, exiting" action="exit"
 

@@ -8,8 +8,8 @@ set -x
 ## TODO: Ideally, run_metadata should be passed as gitlab runner (CI runtime) ENV
 run_metadata="cstor"
 
-## https://github.com/openebs/litmus/blob/master/apps/percona/chaos/openebs_target_network_delay/test_vars.yml
-test_name="openebs-target-network-delay" 
+## https://github.com/openebs/litmus/blob/master/apps/percona/deployers/test_vars.yml
+test_name="mongodb-deployment" 
 
 if [[ -n "$run_metadata" ]]; then
   test_name="$test_name-$run_metadata"
@@ -62,22 +62,24 @@ task_delimiter;
 ## LITMUS PRECONDITIONING ##
 ############################
 
-## TODO: Add logic to replace job ENV (SC, PVC, LABEL, NS) based on run instance intent 
+## TODO: Better way/logic to replace job ENV (SC, PVC, LABEL, NS) based on run instance intent (CLI) 
 ## TODO: Add logic to add ENV for run_instance_metadata/RunID
 
 : << EOF
-  ---------------------------------------------------------------------------------------------------
- | specAttribute        | kind     | jiva                         | cStor-sparse                      |
-  --------------------------------------------------------------------------------------------------- |
- | litmusJobLabel       | jobSpec  | openebs-target-network-delay | openebs-target-network-delay-cstor|
- | appNamespace         | env      | litmus                       | percona-cstor                     |
- | runID                | env(add) |    -                         | cstor                             | 
-  ----------------------------------------------------------------------------------------------------
+  ----------------------------------------------------------------------------------------
+ | specAttribute        | kind	   | jiva       		| cStor-sparse  	  |
+  ----------------------------------------------------------------------------------------
+ | litmusJobLabel       | jobSpec  | mongodb-deployment-litmus  | mongodb-deployment-cstor|     
+ | providerStorageClass | env 	   | openebs-standard   	| openebs-cstor-sparse    |
+ | appNamespace         | env	   | litmus             	| mongodb-cstor           |
+ | runID		| env(add) | 	-			| cstor                   |
+  ----------------------------------------------------------------------------------------
 EOF
 
-cp apps/percona/chaos/openebs_target_failure/run_litmus_test.yml run_cstor_litmus_test.yml
-sed -i -e 's/name: openebs-target-network-delay/name: openebs-target-network-delay-cstor/g' \
--e 's/value: litmus/value: percona-cstor/g' run_cstor_litmus_test.yml
+cp apps/mongodb/deployers/run_litmus_test.yml run_cstor_litmus_test.yml
+sed -i -e 's/app: mongodb-deployment-litmus/app: mongodb-deployment-cstor/g' \
+-e 's/value: openebs-standard/value: openebs-cstor-sparse/g' \
+-e 's/value: litmus/value: mongodb-cstor/g' run_cstor_litmus_test.yml
 
 sed -i '/command:/i \
           - name: RUN_ID\
@@ -90,9 +92,9 @@ sed -i '/command:/i \
 
 echo "Running the litmus test.."
 
-## Create the litmus job for percona app chaos test: openebs-target-network-delay
+## Create the litmus job for percona app deploy with cstor storage class
 
-jobNameCmd="kubectl get jobs -n litmus --no-headers -o jsonpath='{.items[?(@.metadata.labels.name==\"openebs-target-network-delay-cstor\")].metadata.name}'"
+jobNameCmd="kubectl get jobs -n litmus --no-headers -o jsonpath='{.items[?(@.metadata.labels.app==\"mongodb-deployment-cstor\")].metadata.name}'"
 
 job_deploy_out=$(kubectl create -f run_cstor_litmus_test.yml) && \
 job_name=$(eval $jobNameCmd); retcode=$?

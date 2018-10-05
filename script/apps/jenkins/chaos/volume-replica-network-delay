@@ -65,6 +65,21 @@ task_delimiter;
 ## TODO: Add logic to replace job ENV (SC, PVC, LABEL, NS) based on run instance intent 
 ## TODO: Add logic to add ENV for run_instance_metadata/RunID
 
+
+: << EOF
+  ----------------------------------------------------------------------------------
+ | specAttribute        | kind     | percona             | jenkins                  |
+  ----------------------------------------------------------------------------------|
+ | appLabel             | env      | name=percona        | app=jenkins-app          |
+ | pvcName              | env      | percona-mysql-claim | jenkins-claim            | 
+  ----------------------------------------------------------------------------------
+EOF
+
+cp apps/percona/chaos/openebs_replica_network_delay/run_litmus_test.yml run_jenkins_jiva_network_delay.yml
+
+sed -i -e 's/''name=percona''/''app=jenkins-app''/g' \
+-e 's/value: percona-mysql-claim/value: jenkins-claim/g' run_jenkins_jiva_rep_network_delay.yml
+
 #################
 ## RUNNER MAIN ##
 #################
@@ -75,7 +90,7 @@ echo "Running the litmus test.."
 
 jobNameCmd="kubectl get jobs -n litmus --no-headers -o jsonpath='{.items[?(@.metadata.labels.name==\"openebs-replica-network\")].metadata.name}'"
 
-job_deploy_out=$(kubectl create -f apps/percona/chaos/openebs_replica_network_delay/run_litmus_test.yml) && \
+job_deploy_out=$(kubectl create -f run_jenkins_jiva_rep_network_delay.yml) && \
 job_name=$(eval $jobNameCmd); retcode=$?
 error_handler $retcode msg="Unable to run litmusbook, exiting" action="exit"
 
