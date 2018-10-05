@@ -103,7 +103,19 @@ percona-cstor:
     paths:
       - aws-openebs/
 
-jiva-replica-failure:
+mongo-cstor:
+  image: atulabhi/kops:v8
+  stage: stateful-apps-deploy
+  dependencies:
+    - openebs-aws-deploy
+  script: 
+   - ./script/apps/mongo/deployer/mongo-app-deploy-cstor
+
+  artifacts:
+    paths:
+      - aws-openebs/
+
+jiva-replica-failure(percona):
   image: atulabhi/kops:v8
   dependencies:
     - percona-jiva
@@ -115,43 +127,43 @@ jiva-replica-failure:
     paths:
       - aws-openebs/
 
-#jiva-controller-failure:
-#  image: atulabhi/kops:v8
-#  dependencies:
-#    - jiva-replica-failure
-#  stage: chaos-test
-#  script:
-#   - ./script/apps/percona/chaos/jiva/volume-controller-failure
+jiva-controller-failure(mongo):
+  image: atulabhi/kops:v8
+  dependencies:
+    - mongo-jiva
+  stage: chaos-test
+  script:
+   - ./script/apps/mongo/chaos/jiva/volume-controller-failure
 
-#  artifacts:
-#    paths:
-#      - aws-openebs/
+  artifacts:
+    paths:
+      - aws-openebs/
 
-#jiva-replica-nw-delay:
-#  image: atulabhi/kops:v8
-#  dependencies:
-#    - jiva-controller-failure
-#  stage: chaos-test
-#  script:
-#   - ./script/apps/percona/chaos/jiva/volume-replica-network-delay
+jiva-replica-nw-delay(jenkins):
+  image: atulabhi/kops:v8
+  dependencies:
+    - jenkins-jiva
+  stage: chaos-test
+  script:
+   - ./script/apps/jenkins/chaos/jiva/volume-replica-network-delay
 
-#  artifacts:
-#    paths:
-#      - aws-openebs/
+  artifacts:
+    paths:
+      - aws-openebs/
 
-#jiva-controller-nw-delay:
-#  image: atulabhi/kops:v8
-#  dependencies:
-#    - jiva-replica-nw-delay
-#  stage: chaos-test
-#  script:
-#   - ./script/apps/percona/chaos/jiva/volume-controller-network-delay
+jiva-controller-nw-delay(postgres):
+  image: atulabhi/kops:v8
+  dependencies:
+    - postgres-jiva
+  stage: chaos-test
+  script:
+   - ./script/apps/postgres/chaos/jiva/volume-controller-network-delay
 
-#  artifacts:
-#    paths:
-#      - aws-openebs/
+  artifacts:
+    paths:
+      - aws-openebs/
 
-cstor-target-failure:
+cstor-target-failure(percona):
   image: atulabhi/kops:v8
   dependencies:
     - percona-cstor
@@ -163,17 +175,17 @@ cstor-target-failure:
     paths:
       - aws-openebs/
 
-#cstor-target-nw-delay:
-#  image: atulabhi/kops:v8
-#  dependencies:
-#    - cstor-target-failure
-#  stage: chaos-test
-#  script:
-#   - ./script/apps/percona/chaos/cstor/volume-target-network-delay
+cstor-target-nw-delay(mongo):
+  image: atulabhi/kops:v8
+  dependencies:
+    - mongo-cstor
+  stage: chaos-test
+  script:
+   - ./script/apps/mongo/chaos/cstor/volume-target-network-delay
 
-#  artifacts:
-#    paths:
-#      - aws-openebs/
+  artifacts:
+    paths:
+      - aws-openebs/
 
 cleanup-aws:
   when: always
