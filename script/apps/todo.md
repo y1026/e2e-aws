@@ -5,3 +5,4 @@
 5. Truth table in README for app-engine-chaos combo 
 6. Notes for PVC names of statefulsets in runner 
 7. Issues for jsonpath changes to get ctrl/rep PV
+8. Move chaos jobs outside percona? 
