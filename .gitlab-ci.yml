@@ -1,5 +1,7 @@
 ## TODO: Modularize the gitlab yaml to reuse templates
 
+## Define the stages & order of execution
+
 stages:
   - cluster-setup
   - infra-setup
@@ -8,15 +10,18 @@ stages:
   - cleanup
   - deploy
 
+## Setup the kubernetes cluster
+
 aws-cluster:
   image: atulabhi/kops:v8
   stage: cluster-setup
   script: 
     - ./script/aws
-
   artifacts:
     paths:
       - aws/
+
+## Setup OpenEBS control plane
 
 openebs-aws-deploy:
   image: atulabhi/kops:v8
@@ -24,168 +29,99 @@ openebs-aws-deploy:
   dependencies:
     - aws-cluster
   script: 
-   - echo "deploying OpenEBS on AWS"
    - ./script/provider/infra-setup
-  
   artifacts:
     paths:
       - aws-openebs/
 
-percona-jiva:
+## Define a job template for app deployers
+
+.app_deploy_template:
   image: atulabhi/kops:v8
   stage: stateful-apps-deploy
   dependencies:
     - openebs-aws-deploy
+  artifacts:
+    paths: 
+      - aws-openebs/
+
+## Define the app deployer jobs
+
+percona-jiva:
+  extends: .app_deploy_template
   script: 
    - ./script/apps/percona/deployer/percona-app-deploy-jiva
 
-  artifacts:
-    paths:
-      - aws-openebs/
-
 mongo-jiva:
-  image: atulabhi/kops:v8
-  stage: stateful-apps-deploy
-  dependencies:
-    - openebs-aws-deploy
+  extends: .app_deploy_template
   script: 
    - ./script/apps/mongo/deployer/mongo-app-deploy-jiva
 
-  artifacts:
-    paths:
-      - aws-openebs/
-
 postgres-jiva:
-  image: atulabhi/kops:v8
-  stage: stateful-apps-deploy
-  dependencies:
-    - openebs-aws-deploy
+  extends: .app_deploy_template
   script: 
    - ./script/apps/postgres/deployer/postgres-app-deploy-jiva
 
-  artifacts:
-    paths:
-      - aws-openebs/
-
 cassandra-jiva:
-  image: atulabhi/kops:v8
-  stage: stateful-apps-deploy
-  dependencies:
-    - openebs-aws-deploy
+  extends: .app_deploy_template
   script: 
    - ./script/apps/cassandra/deployer/cassandra-app-deploy-jiva
 
-  artifacts:
-    paths:
-      - aws-openebs/
-
 jenkins-jiva:
-  image: atulabhi/kops:v8
-  stage: stateful-apps-deploy
-  dependencies:
-    - openebs-aws-deploy
+  extends: .app_deploy_template
   script: 
    - ./script/apps/jenkins/deployer/jenkins-app-deploy-jiva
 
-  artifacts:
-    paths:
-      - aws-openebs/
-
 percona-cstor:
-  image: atulabhi/kops:v8
-  stage: stateful-apps-deploy
-  dependencies:
-    - openebs-aws-deploy
+  extends: .app_deploy_template
   script: 
    - ./script/apps/percona/deployer/percona-app-deploy-cstor
 
-  artifacts:
-    paths:
-      - aws-openebs/
-
 #mongo-cstor:
-#  image: atulabhi/kops:v8
-#  stage: stateful-apps-deploy
-#  dependencies:
-#    - openebs-aws-deploy
+#  extends: .app_deploy_template
 #  script: 
 #   - ./script/apps/mongo/deployer/mongo-app-deploy-cstor
 
-#  artifacts:
-#    paths:
-#      - aws-openebs/
+## Define job template for chaos jobs 
 
-jiva-rep-kill(percona):
+.chaos_test_template:
   image: atulabhi/kops:v8
-  dependencies:
-    - percona-jiva
-  stage: chaos-test
+  stage: chaos-test 
+  when: always 
+  artifacts:
+    paths: 
+      - aws-openebs/
+
+repl-kill(percona-jiva):
+  extends: .chaos_test_template #dependencies: percona-jiva
   script:
    - ./script/apps/percona/chaos/jiva/volume-replica-failure
 
-  artifacts:
-    paths:
-      - aws-openebs/
-
-jiva-ctrl-kill(mongo):
-  image: atulabhi/kops:v8
-  dependencies:
-    - mongo-jiva
-  stage: chaos-test
+ctrl-kill(mongo-jiva)):
+  extends: .chaos_test_template #dependencies: mongo-jiva
   script:
    - ./script/apps/mongo/chaos/jiva/volume-controller-failure
 
-  artifacts:
-    paths:
-      - aws-openebs/
-
-jiva-rep-n/w-loss(jenkins):
-  image: atulabhi/kops:v8
-  dependencies:
-    - jenkins-jiva
-  stage: chaos-test
+repl-nw-loss(jenkins-jiva):
+  extends: .chaos_test_template #dependencies: jenkins-jiva
   script:
    - ./script/apps/jenkins/chaos/jiva/volume-replica-network-delay
 
-  artifacts:
-    paths:
-      - aws-openebs/
-
-jiva-ctrl-n/w-loss(postgres):
-  image: atulabhi/kops:v8
-  dependencies:
-    - postgres-jiva
-  stage: chaos-test
+ctrl-nw-loss(postgres-jiva):
+  extends: .chaos_test_template #dependencies: postgres-jiva
   script:
    - ./script/apps/postgres/chaos/jiva/volume-controller-network-delay
 
-  artifacts:
-    paths:
-      - aws-openebs/
-
-cstor-tgt-kill(percona):
-  image: atulabhi/kops:v8
-  dependencies:
-    - percona-cstor
-  stage: chaos-test
+tgt-kill(percona-cstor):
+  extends: .chaos_test_template #dependencies: percona-cstor
   script:
    - ./script/apps/percona/chaos/cstor/volume-target-failure
 
-  artifacts:
-    paths:
-      - aws-openebs/
-
-#cstor-tgt-n/w-loss(mongo):
-#  image: atulabhi/kops:v8
-#  dependencies:
-#    - mongo-cstor
-#  stage: chaos-test
+#tgt-nw-loss(mongo-cstor):
+#  extends: .chaos_test_template #dependencies: mongo-cstor
 #  script:
 #   - ./script/apps/mongo/chaos/cstor/volume-target-network-delay
 
-#  artifacts:
-#    paths:
-#      - aws-openebs/
 
 cleanup-aws:
   when: always
