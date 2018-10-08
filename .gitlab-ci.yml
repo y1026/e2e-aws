@@ -92,32 +92,32 @@ percona-cstor:
     paths: 
       - aws-openebs/
 
-repl-kill(percona-jiva):
+repl-kill-{percona-jiva}:
   extends: .chaos_test_template #dependencies: percona-jiva
   script:
    - ./script/apps/percona/chaos/jiva/volume-replica-failure
 
-ctrl-kill(mongo-jiva)):
+ctrl-kill-{mongo-jiva}:
   extends: .chaos_test_template #dependencies: mongo-jiva
   script:
    - ./script/apps/mongo/chaos/jiva/volume-controller-failure
 
-repl-nw-loss(jenkins-jiva):
+repl-disconnect-{jenkins-jiva}:
   extends: .chaos_test_template #dependencies: jenkins-jiva
   script:
    - ./script/apps/jenkins/chaos/jiva/volume-replica-network-delay
 
-ctrl-nw-loss(postgres-jiva):
+ctrl-disconnect-{postgres-jiva}:
   extends: .chaos_test_template #dependencies: postgres-jiva
   script:
    - ./script/apps/postgres/chaos/jiva/volume-controller-network-delay
 
-tgt-kill(percona-cstor):
+tgt-kill-{percona-cstor}:
   extends: .chaos_test_template #dependencies: percona-cstor
   script:
    - ./script/apps/percona/chaos/cstor/volume-target-failure
 
-#tgt-nw-loss(mongo-cstor):
+#tgt-disconnect-{mongo-cstor}:
 #  extends: .chaos_test_template #dependencies: mongo-cstor
 #  script:
 #   - ./script/apps/mongo/chaos/cstor/volume-target-network-delay
