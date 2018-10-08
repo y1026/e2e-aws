@@ -77,6 +77,7 @@ EOF
 cp apps/percona/chaos/openebs_target_network_delay/run_litmus_test.yml run_postgres_ctrl_network_delay.yml
 
 sed -i -e 's/''name=percona''/''app=pgset''/g' \
+-e 's/value: app-percona-ns/value: app-postgres-ns/g' \
 -e 's/value: percona-mysql-claim/value: pgdata-claim-pgset-0/g' run_postgres_ctrl_network_delay.yml
 
 
