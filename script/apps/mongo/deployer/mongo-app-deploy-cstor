@@ -71,7 +71,7 @@ task_delimiter;
   ----------------------------------------------------------------------------------------
  | litmusJobLabel       | jobSpec  | mongodb-deployment-litmus  | mongodb-deployment-cstor|     
  | providerStorageClass | env 	   | openebs-mongodb     	| openebs-cstor-sparse    |
- | appNamespace         | env	   | litmus             	| mongodb-cstor           |
+ | appNamespace         | env	   | app-mongo-ns             	| mongodb-cstor           |
  | runID		| env(add) | 	-			| cstor                   |
   ----------------------------------------------------------------------------------------
 EOF
@@ -79,7 +79,7 @@ EOF
 cp apps/mongodb/deployers/run_litmus_test.yml run_cstor_litmus_test.yml
 sed -i -e 's/app: mongodb-deployment-litmus/app: mongodb-deployment-cstor/g' \
 -e 's/value: openebs-mongodb/value: openebs-cstor-sparse/g' \
--e 's/value: litmus/value: mongodb-cstor/g' run_cstor_litmus_test.yml
+-e 's/value: app-mongo-ns/value: mongodb-cstor/g' run_cstor_litmus_test.yml
 
 sed -i '/command:/i \
           - name: RUN_ID\

@@ -6,4 +6,5 @@
 6. Notes for PVC names of statefulsets in runner 
 7. Issues for jsonpath changes to get ctrl/rep PV
 8. Move chaos jobs outside percona?
-9. Need to identify ideal image instance types? https://success.docker.com/article/what-causes-a-container-to-exit-with-code-137 
+9. Need to identify ideal image instance types? https://success.docker.com/article/what-causes-a-container-to-exit-with-code-1374
+10. Deploy statefulset with single replica 
