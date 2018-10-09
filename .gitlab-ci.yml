@@ -47,10 +47,17 @@ openebs-aws-deploy:
 
 ## Define the app deployer jobs
 
-percona-jiva:
+percona-jiva 0:2:
   extends: .app_deploy_template
   script: 
    - ./script/apps/percona/deployer/percona-app-deploy-jiva
+
+percona-jiva 1:2:
+  extends: .app_deploy_template
+  before_script: 
+   - sleep 180
+  script: 
+   - ./script/apps/percona/workload/jiva/percona-app-workload-jiva
 
 mongo-jiva:
   extends: .app_deploy_template

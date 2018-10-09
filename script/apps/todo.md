@@ -10,3 +10,6 @@
 10. Deploy statefulset with single replica 
 11. Application pod kill (ext4, xfs)
 12. CentOS platform  
+13. Usage of openebs-standalone for statefulsets & corresponding SC in cstor 
+14. Prometheus, redis deployers.
+15. Cassandra for chaos tests/func jobs 
