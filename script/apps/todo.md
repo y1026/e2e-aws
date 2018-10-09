@@ -13,3 +13,4 @@
 13. Usage of openebs-standalone for statefulsets & corresponding SC in cstor 
 14. Prometheus, redis deployers.
 15. Cassandra for chaos tests/func jobs 
+16. Logger - sono pods stuck
