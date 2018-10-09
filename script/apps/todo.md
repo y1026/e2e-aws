@@ -8,4 +8,5 @@
 8. Move chaos jobs outside percona?
 9. Need to identify ideal AWS  image instance types? https://success.docker.com/article/what-causes-a-container-to-exit-with-code-1374
 10. Deploy statefulset with single replica 
-11. <todo>
+11. Application pod kill (ext4, xfs)
+12. CentOS platform  
