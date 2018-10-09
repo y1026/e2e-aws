@@ -8,8 +8,8 @@ set -x
 ## TODO: Ideally, run_metadata should be passed as gitlab runner (CI runtime) ENV
 run_metadata=""
 
-## https://github.com/openebs/litmus/blob/master/apps/percona/chaos/openebs_target_network_delay/test_vars.yml
-test_name="openebs-target-network-delay" 
+## https://github.com/openebs/litmus/blob/master/apps/percona/deployers/test_vars.yml
+test_name="crunchy-loadgen" 
 
 if [[ -n "$run_metadata" ]]; then
   test_name="$test_name-$run_metadata"
@@ -54,7 +54,7 @@ cp -r aws-openebs/ssh/. ~/.ssh/
 #cd litmus; git checkout v0.7-RC1
 
 git clone https://github.com/openebs/litmus.git
-cd litmus
+cd litmus 
 
 task_delimiter;
 
@@ -65,33 +65,17 @@ task_delimiter;
 ## TODO: Add logic to replace job ENV (SC, PVC, LABEL, NS) based on run instance intent 
 ## TODO: Add logic to add ENV for run_instance_metadata/RunID
 
-: << EOF
-  ----------------------------------------------------------------------------------
- | specAttribute        | kind     | percona             | mongodb                  |
-  ----------------------------------------------------------------------------------|
- | appLabel             | env      | name=percona        | app=pgset                |
- | pvcName              | env      | percona-mysql-claim | pgdata-claim-pgset-0     | 
-  ----------------------------------------------------------------------------------
-EOF
-
-cp apps/percona/chaos/openebs_target_network_delay/run_litmus_test.yml run_postgres_ctrl_network_delay.yml
-
-sed -i -e 's/''name=percona''/''app=pgset''/g' \
--e 's/value: app-percona-ns/value: app-pgres-ns/g' \
--e 's/value: percona-mysql-claim/value: pgdata-claim-pgset-0/g' run_postgres_ctrl_network_delay.yml
-
-
 #################
 ## RUNNER MAIN ##
 #################
 
 echo "Running the litmus test.."
 
-## Create the litmus job for percona app chaos test: openebs-target-network-delay
+## Create the litmus job for percona app deploy
 
-jobNameCmd="kubectl get jobs -n litmus --no-headers -o jsonpath='{.items[?(@.metadata.labels.name==\"openebs-target-network-delay\")].metadata.name}'"
+jobNameCmd="kubectl get jobs -n litmus --no-headers -o jsonpath='{.items[?(@.metadata.labels.loadgen==\"postgres-loadjob\")].metadata.name}'"
 
-job_deploy_out=$(kubectl create -f run_postgres_ctrl_network_delay.yml) && \
+job_deploy_out=$(kubectl create -f apps/crunchy-postgres/workload/run_litmus_test.yml) && \
 job_name=$(eval $jobNameCmd); retcode=$?
 error_handler $retcode msg="Unable to run litmusbook, exiting" action="exit"
 
