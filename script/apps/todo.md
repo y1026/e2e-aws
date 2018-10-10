@@ -15,3 +15,5 @@
 15. Cassandra for chaos tests/func jobs 
 16. Logger - sono pods stuck
 17. Liveness sidecar additions
+18. DB init checks for percona/others? 
+19. gitlab runner - kops image into openebs repo

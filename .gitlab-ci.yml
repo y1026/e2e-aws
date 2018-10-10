@@ -3,18 +3,17 @@
 ## Define the stages & order of execution
 
 stages:
-  - cluster-setup
-  - infra-setup
-  - stateful-apps-deploy
-  - chaos-test
-  - cleanup
-  - deploy
+  - CLUSTER-SETUP
+  - PROVIDER-INFRA-SETUP
+  - STATEFUL-APP-DEPLOY
+  - APP-CHAOS-TEST
+  - CLUSTER-CLEANUP
 
 ## Setup the kubernetes cluster
 
 aws-cluster:
   image: atulabhi/kops:v8
-  stage: cluster-setup
+  stage: CLUSTER-SETUP 
   script: 
     - ./script/aws
   artifacts:
@@ -25,7 +24,7 @@ aws-cluster:
 
 openebs-aws-deploy:
   image: atulabhi/kops:v8
-  stage: infra-setup
+  stage: PROVIDER-INFRA-SETUP
   dependencies:
     - aws-cluster
   script: 
@@ -38,7 +37,7 @@ openebs-aws-deploy:
 
 .app_deploy_template:
   image: atulabhi/kops:v8
-  stage: stateful-apps-deploy
+  stage: STATEFUL-APP-DEPLOY 
   dependencies:
     - openebs-aws-deploy
   artifacts:
@@ -48,12 +47,12 @@ openebs-aws-deploy:
 ## Define the app deployer jobs
 
 ## PERCONA-JIVA
-percona-jiva 0:2:
+percona-jiva-run/load/check 0:2:
   extends: .app_deploy_template
   script: 
    - ./script/apps/percona/deployer/percona-app-deploy-jiva
 
-percona-jiva 1:2:
+percona-jiva-run/load/check 1:2:
   extends: .app_deploy_template
   before_script: 
    - sleep 180
@@ -61,12 +60,12 @@ percona-jiva 1:2:
    - ./script/apps/percona/workload/jiva/percona-app-workload-jiva
 
 ## MONGO-JIVA
-mongo-jiva 0:2:
+mongo-jiva-run/load/check 0:2:
   extends: .app_deploy_template
   script: 
    - ./script/apps/mongo/deployer/mongo-app-deploy-jiva
 
-mongo-jiva 1:2:
+mongo-jiva-run/load/check 1:2:
   extends: .app_deploy_template
   before_script: 
    - sleep 180
@@ -74,12 +73,12 @@ mongo-jiva 1:2:
    - ./script/apps/mongo/workload/jiva/mongo-app-workload-jiva
 
 # POSTGRES-JIVA
-postgres-jiva 0:2:
+postgres-jiva-run/load/check 0:2:
   extends: .app_deploy_template
   script: 
    - ./script/apps/postgres/deployer/postgres-app-deploy-jiva
 
-postgres-jiva 1:2:
+postgres-jiva-run/load/check 1:2:
   extends: .app_deploy_template
   before_script: 
    - sleep 180
@@ -87,12 +86,12 @@ postgres-jiva 1:2:
    - ./script/apps/postgres/workload/jiva/postgres-app-workload-jiva
 
 # CASSANDRA-JIVA
-cassandra-jiva 0:2:
+cassandra-jiva-run/load/check 0:2:
   extends: .app_deploy_template
   script: 
    - ./script/apps/cassandra/deployer/cassandra-app-deploy-jiva
 
-cassandra-jiva 1:2:
+cassandra-jiva-run/load/check 1:2:
   extends: .app_deploy_template
   before_script: 
    - sleep 180
@@ -100,25 +99,25 @@ cassandra-jiva 1:2:
    - ./script/apps/cassandra/workload/jiva/cassandra-app-workload-jiva
 
 # JENKINS-JIVA
-jenkins-jiva:
+jenkins-jiva-run/load/check:
   extends: .app_deploy_template
   script: 
    - ./script/apps/jenkins/deployer/jenkins-app-deploy-jiva
 
 # PERCONA-CSTOR
-percona-cstor 0:2:
+percona-cstor-run/load/check 0:2:
   extends: .app_deploy_template
   script: 
    - ./script/apps/percona/deployer/percona-app-deploy-cstor
 
-percona-cstor 1:2:
+percona-cstor-run/load/check 1:2:
   extends: .app_deploy_template
   before_script: 
    - sleep 180
   script: 
    - ./script/apps/percona/workload/cstor/percona-app-workload-cstor
 
-#mongo-cstor:
+#mongo-cstor-run/load/check:
 #  extends: .app_deploy_template
 #  script: 
 #   - ./script/apps/mongo/deployer/mongo-app-deploy-cstor
@@ -127,7 +126,7 @@ percona-cstor 1:2:
 
 .chaos_test_template:
   image: atulabhi/kops:v8
-  stage: chaos-test 
+  stage: APP-CHAOS-TEST
   when: always 
   artifacts:
     paths: 
@@ -169,7 +168,7 @@ cleanup-aws:
   image: atulabhi/kops:v8
   dependencies:
     - aws-cluster
-  stage: cleanup
+  stage: CLUSTER-CLEANUP
   script: 
     - chmod 755 ./script/aws-cleanup
     - ./script/aws-cleanup
