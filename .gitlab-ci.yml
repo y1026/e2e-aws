@@ -6,6 +6,7 @@ stages:
   - CLUSTER-SETUP
   - PROVIDER-INFRA-SETUP
   - STATEFUL-APP-DEPLOY
+  - APP-FUNC-TEST
   - APP-CHAOS-TEST
   - CLUSTER-CLEANUP
 
@@ -121,6 +122,21 @@ percona-cstor-run/load/check 1:2:
 #  extends: .app_deploy_template
 #  script: 
 #   - ./script/apps/mongo/deployer/mongo-app-deploy-cstor
+
+## Define job template for func test jobs  
+
+.func_test_template:
+  image: atulabhi/kops:v8
+  stage: APP-FUNC-TEST
+  when: always 
+  artifacts:
+    paths: 
+      - aws-openebs/
+
+app-replica-scale-{cassandra-jiva}:
+  extends: .func_test_template #dependencies: percona-jiva
+  script:
+   - ./script/apps/cassandra/functional/jiva/app-sts-replica-scale 
 
 ## Define job template for chaos jobs 
 

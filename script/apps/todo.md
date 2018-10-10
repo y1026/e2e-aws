@@ -17,3 +17,4 @@
 17. Liveness sidecar additions
 18. DB init checks for percona/others? 
 19. gitlab runner - kops image into openebs repo
+20. App cleanup and OpenEBS cleanup stage
