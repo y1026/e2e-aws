@@ -142,9 +142,14 @@ mongo-cstor-run/load/check 1:2:
       - aws-openebs/
 
 app-replica-scale-{cassandra-jiva}:
-  extends: .func_test_template #dependencies: percona-jiva
+  extends: .func_test_template #dependencies: cassandra-jiva
   script:
    - ./script/apps/cassandra/functional/jiva/app-sts-replica-scale 
+
+app-upgrade-deployment-{jenkins-jiva}:
+  extends: .func_test_template #dependencies: jenkins-jiva
+  script:
+   - ./script/apps/jenkins/functional/jiva/app-upgrade-deployment
 
 ## Define job template for chaos jobs 
 
@@ -185,7 +190,6 @@ tgt-disconnect-{mongo-cstor}:
   extends: .chaos_test_template #dependencies: mongo-cstor
   script:
    - ./script/apps/mongo/chaos/cstor/volume-target-network-delay
-
 
 cleanup-aws:
   when: always
