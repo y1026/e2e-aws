@@ -2,17 +2,26 @@
 
 set -e
 
-echo "AWS-Cleanup"
+echo "AWS Cluster Cleaning"
+
+# ------------------------- Setting aws credentails -------------------------------
+
 export AWS_ACCESS_KEY_ID=$AC_ID
 export AWS_SECRET_ACCESS_KEY=$AC_KEY
 export AWS_DEFAULT_REGION=eu-west-2
 export AWS_DEFAULT_OUTPUT=json
+
+# ---- Creating Directory and storing necessary data inside it --------------------
 mkdir /tmp/aws
 cat aws/cluster/id.csv > /tmp/aws/id.csv
 cat aws/cluster/cluster_name.csv >/tmp/aws/cluster_name.csv
-mkdir cluster && cd cluster #remove this with litmus
-git clone https://github.com/chandankumar4/test.git
-cd test/k8s/aws/k8s-installer
-sleep 30
-ansible-playbook delete-aws-cluster.yml
-ansible-playbook delete-pre-requisite.yml
+
+# ---- Cloning litmus repository for cleaning AWS cluster and pre-requisite--------
+git clone https://github.com/openebs/litmus.git
+cd litmus/k8s/aws/k8s-installer
+
+# ---------------------- Deleting AWS cluster -------------------------------------
+ansible-playbook delete-aws-cluster.yml -v
+
+# ---------------------- Deleting AWS pre-requisite -------------------------------
+ansible-playbook delete-pre-requisite.yml -v
