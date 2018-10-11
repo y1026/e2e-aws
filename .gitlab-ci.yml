@@ -151,6 +151,11 @@ app-upgrade-deployment-{jenkins-jiva}:
   script:
    - ./script/apps/jenkins/functional/jiva/app-upgrade-deployment
 
+volume-data-integrity-{fio-jiva}:
+  extends: .func_test_template #dependencies: jenkins-jiva
+  script:
+   - ./script/apps/fio/tests/jiva/fio-volume-data-integrity-check
+
 ## Define job template for chaos jobs 
 
 .chaos_test_template:

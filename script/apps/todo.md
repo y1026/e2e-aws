@@ -20,4 +20,5 @@
 20. App cleanup and OpenEBS cleanup stage
 21. Not tracking end of Loadgens 
 22. Need App/DB init confirmation checks inside deployers where applicable 
-23. Auto-scaler for KOPS 
+23. Auto-scaler for KOPS
+24. Make test jobs labels consistent 
