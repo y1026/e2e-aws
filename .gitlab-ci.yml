@@ -1,127 +1,207 @@
+## TODO: Modularize the gitlab yaml to reuse templates
+
+## Define the stages & order of execution
+
 stages:
-  - cluster-setup
-  - infra-setup
-  - stateful-apps-deploy
-  - chaos-test
-  - cleanup
-  - deploy
+  - CLUSTER-SETUP
+  - PROVIDER-INFRA-SETUP
+  - STATEFUL-APP-DEPLOY
+  - APP-FUNC-TEST
+  - APP-CHAOS-TEST
+  - CLUSTER-CLEANUP
+
+## Setup the kubernetes cluster
 
 aws-cluster:
   image: atulabhi/kops:v8
-  stage: cluster-setup
+  stage: CLUSTER-SETUP 
   script: 
-    - chmod 755 ./script/aws
     - ./script/aws
-
   artifacts:
     paths:
       - aws/
 
+## Setup OpenEBS control plane
+
 openebs-aws-deploy:
   image: atulabhi/kops:v8
-  stage: infra-setup
+  stage: PROVIDER-INFRA-SETUP
   dependencies:
     - aws-cluster
   script: 
-   - echo "deploying OpenEBS on AWS"
-   - chmod 775 ./script/infra-setup
-   - ./script/infra-setup
-  
+   - ./script/provider/infra-setup
   artifacts:
     paths:
       - aws-openebs/
 
-percona-jiva:
+## Define a job template for app deployers
+
+.app_deploy_template:
   image: atulabhi/kops:v8
-  stage: stateful-apps-deploy
+  stage: STATEFUL-APP-DEPLOY 
   dependencies:
     - openebs-aws-deploy
-  script: 
-   #- echo "jobs-AWS-Started"
-   - chmod 775 ./script/percona-app-deploy
-   - ./script/percona-app-deploy
-
   artifacts:
-    paths:
+    paths: 
       - aws-openebs/
 
-mongo-jiva:
-  image: atulabhi/kops:v8
-  stage: stateful-apps-deploy
-  dependencies:
-    - openebs-aws-deploy
-  script: 
-   #- echo "jobs-AWS-Started"
-   - chmod 775 ./script/mongo-app-deploy
-   - ./script/mongo-app-deploy
+## Define the app deployer jobs
 
+## PERCONA-JIVA
+percona-jiva-run/load/check 0:2:
+  extends: .app_deploy_template
+  script: 
+   - ./script/apps/percona/deployer/percona-app-deploy-jiva
+
+percona-jiva-run/load/check 1:2:
+  extends: .app_deploy_template
+  before_script: 
+   - sleep 180
+  script: 
+   - ./script/apps/percona/workload/jiva/percona-app-workload-jiva
+
+## MONGO-JIVA
+mongo-jiva-run/load/check 0:2:
+  extends: .app_deploy_template
+  script: 
+   - ./script/apps/mongo/deployer/mongo-app-deploy-jiva
+
+mongo-jiva-run/load/check 1:2:
+  extends: .app_deploy_template
+  before_script: 
+   - sleep 180
+  script: 
+   - ./script/apps/mongo/workload/jiva/mongo-app-workload-jiva
+
+# POSTGRES-JIVA
+postgres-jiva-run/load/check 0:2:
+  extends: .app_deploy_template
+  script: 
+   - ./script/apps/postgres/deployer/postgres-app-deploy-jiva
+
+postgres-jiva-run/load/check 1:2:
+  extends: .app_deploy_template
+  before_script: 
+   - sleep 180
+  script: 
+   - ./script/apps/postgres/workload/jiva/postgres-app-workload-jiva
+
+# CASSANDRA-JIVA
+cassandra-jiva-run/load/check 0:2:
+  extends: .app_deploy_template
+  script: 
+   - ./script/apps/cassandra/deployer/cassandra-app-deploy-jiva
+
+cassandra-jiva-run/load/check 1:2:
+  extends: .app_deploy_template
+  before_script: 
+   - sleep 180
+  script: 
+   - ./script/apps/cassandra/workload/jiva/cassandra-app-workload-jiva
+
+# JENKINS-JIVA
+jenkins-jiva-run/load/check:
+  extends: .app_deploy_template
+  script: 
+   - ./script/apps/jenkins/deployer/jenkins-app-deploy-jiva
+
+# PERCONA-CSTOR
+percona-cstor-run/load/check 0:2:
+  extends: .app_deploy_template
+  script: 
+   - ./script/apps/percona/deployer/percona-app-deploy-cstor
+
+percona-cstor-run/load/check 1:2:
+  extends: .app_deploy_template
+  before_script: 
+   - sleep 180
+  script: 
+   - ./script/apps/percona/workload/cstor/percona-app-workload-cstor
+
+# MONGO-CSTOR
+mongo-cstor-run/load/check 0:2:
+  extends: .app_deploy_template
+  script: 
+   - ./script/apps/mongo/deployer/mongo-app-deploy-cstor
+
+mongo-cstor-run/load/check 1:2:
+  extends: .app_deploy_template
+  before_script: 
+   - sleep 180
+  script: 
+   - ./script/apps/mongo/workload/cstor/mongo-app-workload-cstor
+
+## Define job template for func test jobs  
+
+.func_test_template:
+  image: atulabhi/kops:v8
+  stage: APP-FUNC-TEST
+  when: always 
   artifacts:
-    paths:
+    paths: 
       - aws-openebs/
 
-postgres-jiva:
-  image: atulabhi/kops:v8
-  stage: stateful-apps-deploy
-  dependencies:
-    - openebs-aws-deploy
-  script: 
-   #- echo "jobs-AWS-Started"
-   - chmod 775 ./script/postgres-app-deploy
-   - ./script/postgres-app-deploy
-
-  artifacts:
-    paths:
-      - aws-openebs/
-
-
-cassandra-jiva:
-  image: atulabhi/kops:v8
-  stage: stateful-apps-deploy
-  dependencies:
-    - openebs-aws-deploy
-  script: 
-   #- echo "jobs-AWS-Started"
-   - chmod 775 ./script/cassandra-app-deploy
-   - ./script/cassandra-app-deploy
-
-  artifacts:
-    paths:
-      - aws-openebs/
-
-
-jenkins-jiva:
-  image: atulabhi/kops:v8
-  stage: stateful-apps-deploy
-  dependencies:
-    - openebs-aws-deploy
-  script: 
-   #- echo "jobs-AWS-Started"
-   - chmod 775 ./script/jenkins-app-deploy
-   - ./script/jenkins-app-deploy
-
-  artifacts:
-    paths:
-      - aws-openebs/
-
-Litmus-Chaos:
-  image: atulabhi/kops:v8
-  dependencies:
-    - percona-jiva
-  stage: chaos-test
+app-replica-scale-{cassandra-jiva}:
+  extends: .func_test_template #dependencies: cassandra-jiva
   script:
-   - chmod 775 ./script/app-chaos
-   - ./script/app-chaos
+   - ./script/apps/cassandra/functional/jiva/app-sts-replica-scale 
 
+app-upgrade-deployment-{jenkins-jiva}:
+  extends: .func_test_template #dependencies: jenkins-jiva
+  script:
+   - ./script/apps/jenkins/functional/jiva/app-upgrade-deployment
+
+volume-data-integrity-{fio-jiva}:
+  extends: .func_test_template #dependencies: jenkins-jiva
+  script:
+   - ./script/apps/fio/tests/jiva/fio-volume-data-integrity-check
+
+## Define job template for chaos jobs 
+
+.chaos_test_template:
+  image: atulabhi/kops:v8
+  stage: APP-CHAOS-TEST
+  when: always 
   artifacts:
-    paths:
+    paths: 
       - aws-openebs/
+
+repl-kill-{percona-jiva}:
+  extends: .chaos_test_template #dependencies: percona-jiva
+  script:
+   - ./script/apps/percona/chaos/jiva/volume-replica-failure
+
+ctrl-kill-{mongo-jiva}:
+  extends: .chaos_test_template #dependencies: mongo-jiva
+  script:
+   - ./script/apps/mongo/chaos/jiva/volume-controller-failure
+
+repl-disconnect-{jenkins-jiva}:
+  extends: .chaos_test_template #dependencies: jenkins-jiva
+  script:
+   - ./script/apps/jenkins/chaos/jiva/volume-replica-network-delay
+
+ctrl-disconnect-{postgres-jiva}:
+  extends: .chaos_test_template #dependencies: postgres-jiva
+  script:
+   - ./script/apps/postgres/chaos/jiva/volume-controller-network-delay
+
+tgt-kill-{percona-cstor}:
+  extends: .chaos_test_template #dependencies: percona-cstor
+  script:
+   - ./script/apps/percona/chaos/cstor/volume-target-failure
+
+tgt-disconnect-{mongo-cstor}:
+  extends: .chaos_test_template #dependencies: mongo-cstor
+  script:
+   - ./script/apps/mongo/chaos/cstor/volume-target-network-delay
 
 cleanup-aws:
   when: always
   image: atulabhi/kops:v8
   dependencies:
     - aws-cluster
-  stage: cleanup
+  stage: CLUSTER-CLEANUP
   script: 
     - chmod 755 ./script/aws-cleanup
     - ./script/aws-cleanup

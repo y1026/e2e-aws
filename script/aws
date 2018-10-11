@@ -14,6 +14,7 @@ export AWS_DEFAULT_OUTPUT=json
 
 # ----------------------------- Cloning litmus repository --------------
 git clone https://github.com/openebs/litmus.git
+#git clone https://github.com/chandankumar4/litmus.git
 cd litmus/k8s/aws/k8s-installer
 
 # ------- Creating Pre-requisite for setup AWS cluster -----------------

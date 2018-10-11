@@ -8,8 +8,8 @@ set -x
 ## TODO: Ideally, run_metadata should be passed as gitlab runner (CI runtime) ENV
 run_metadata=""
 
-## https://github
-test_name="jenkins-deployment" 
+## https://github.com/openebs/litmus/blob/master/apps/mongodb/workload/test_vars.yml
+test_name="mongodb-loadgen" 
 
 if [[ -n "$run_metadata" ]]; then
   test_name="$test_name-$run_metadata"
@@ -50,8 +50,11 @@ cp -r aws-openebs/ssh/. ~/.ssh/
 
 ## Clone the litmus repo, checkout the e2e branch, navigate to litmus root 
 
-git clone https://github.com/atulabhi/litmus.git
-cd litmus; git checkout v0.7-RC1
+#git clone https://github.com/atulabhi/litmus.git
+#cd litmus; git checkout v0.7-RC1
+
+git clone https://github.com/openebs/litmus.git
+cd litmus 
 
 task_delimiter;
 
@@ -68,11 +71,11 @@ task_delimiter;
 
 echo "Running the litmus test.."
 
-## Create the litmus job for jenkins app deploy
+## Create the litmus job for mongo workload 
 
-jobNameCmd="kubectl get jobs -n litmus --no-headers -o jsonpath='{.items[?(@.metadata.labels.app==\"jenkins-deployment-litmus\")].metadata.name}'"
+jobNameCmd="kubectl get jobs -n litmus --no-headers -o jsonpath='{.items[?(@.metadata.labels.loadgen==\"mongodb-loadjob\")].metadata.name}'"
 
-job_deploy_out=$(kubectl create -f apps/jenkins/deployers/run_litmus_test.yml) && \
+job_deploy_out=$(kubectl create -f apps/mongodb/workload/run_litmus_test.yml) && \
 job_name=$(eval $jobNameCmd); retcode=$?
 error_handler $retcode msg="Unable to run litmusbook, exiting" action="exit"
 

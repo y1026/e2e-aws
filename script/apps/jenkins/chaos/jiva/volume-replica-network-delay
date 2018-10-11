@@ -8,8 +8,8 @@ set -x
 ## TODO: Ideally, run_metadata should be passed as gitlab runner (CI runtime) ENV
 run_metadata=""
 
-## https://github.com/openebs/litmus/blob/master/apps/percona/deployers/test_vars.yml
-test_name="percona-deployment" 
+## https://github.com/openebs/litmus/blob/master/apps/percona/chaos/openebs-replica-network-delay/test_vars.yml
+test_name="openebs-replica-network-delay" 
 
 if [[ -n "$run_metadata" ]]; then
   test_name="$test_name-$run_metadata"
@@ -50,8 +50,11 @@ cp -r aws-openebs/ssh/. ~/.ssh/
 
 ## Clone the litmus repo, checkout the e2e branch, navigate to litmus root 
 
-git clone https://github.com/atulabhi/litmus.git
-cd litmus; git checkout v0.7-RC1
+#git clone https://github.com/atulabhi/litmus.git
+#cd litmus; git checkout v0.7-RC1
+
+git clone https://github.com/openebs/litmus.git
+cd litmus
 
 task_delimiter;
 
@@ -62,17 +65,34 @@ task_delimiter;
 ## TODO: Add logic to replace job ENV (SC, PVC, LABEL, NS) based on run instance intent 
 ## TODO: Add logic to add ENV for run_instance_metadata/RunID
 
+
+: << EOF
+  ----------------------------------------------------------------------------------
+ | specAttribute        | kind     | percona             | jenkins                  |
+  ----------------------------------------------------------------------------------|
+ | appLabel             | env      | name=percona        | app=jenkins-app          |
+ | pvcName              | env      | percona-mysql-claim | jenkins-claim            | 
+ | appNamespace         | env      | app-percona-ns      | app-jenkins-ns           | 
+  ----------------------------------------------------------------------------------
+EOF
+
+cp apps/percona/chaos/openebs_replica_network_delay/run_litmus_test.yml run_jenkins_jiva_rep_network_delay.yml
+
+sed -i -e 's/''name=percona''/''app=jenkins-app''/g' \
+-e 's/value: app-percona-ns/value: app-jenkins-ns/g' \
+-e 's/value: percona-mysql-claim/value: jenkins-claim/g' run_jenkins_jiva_rep_network_delay.yml
+
 #################
 ## RUNNER MAIN ##
 #################
 
 echo "Running the litmus test.."
 
-## Create the litmus job for percona app deploy
+## Create the litmus job for jenkins app chaos test: openebs_replica_network_delay
 
-jobNameCmd="kubectl get jobs -n litmus --no-headers -o jsonpath='{.items[?(@.metadata.labels.app==\"percona-deployment\")].metadata.name}'"
+jobNameCmd="kubectl get jobs -n litmus --no-headers -o jsonpath='{.items[?(@.metadata.labels.name==\"openebs-replica-network\")].metadata.name}'"
 
-job_deploy_out=$(kubectl create -f apps/percona/deployers/run_litmus_test.yml) && \
+job_deploy_out=$(kubectl create -f run_jenkins_jiva_rep_network_delay.yml) && \
 job_name=$(eval $jobNameCmd); retcode=$?
 error_handler $retcode msg="Unable to run litmusbook, exiting" action="exit"
 

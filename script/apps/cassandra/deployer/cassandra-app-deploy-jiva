@@ -1,36 +1,35 @@
 #!/bin/bash
-set -ex
+set -x
 
-######################
-##   ENVIRONMENT    ##
-######################
+#################
+## ENVIRONMENT ##
+#################
 
 ## TODO: Ideally, run_metadata should be passed as gitlab runner (CI runtime) ENV
 run_metadata=""
 
-## https://github.com/openebs/litmus/blob/master/apps/percona/deployers/test_vars.yml
-test_name="openebsinstaller"
+## https://github.com/openebs/litmus/blob/master/apps/cassandra/deployers/test_vars.yml
+test_name="cassandra-deployment" 
 
 if [[ -n "$run_metadata" ]]; then
   test_name="$test_name-$run_metadata"
-fi
-
-## Display pipeline info
-echo $CI_PIPELINE_ID; echo $CI_PIPELINE_IID; echo $CI_COMMIT_SHA
-
+fi 
+      
 ################
 ## FUNCTIONS  ##
 ################
+
 error_handler()
 {
 rc=$1; message=$(echo $2 | cut -d "=" -f 2); act=$(echo $3 | cut -d "=" -f 2)
 if [ $rc -ne 0 ]; then
   echo "$message"
   if [ "$act" == "exit" ]; then
-    exit 1
+    exit 1 
   fi
 fi
 }
+
 task_delimiter()
 {
 printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' "%"
@@ -44,26 +43,18 @@ printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' "%"
 ## "aws-openebs" is a shared path for the gitlab runner passed as artifact by gitlab 
 
 echo "Setting up test dependencies.."
-
-# TODO - Investigate need another folder called aws-openebs
-mkdir ~/.kube; cp  aws/.kube/config ~/.kube/config
-mkdir -p aws-openebs/ssh
-
-cat aws/cluster/id.csv > aws-openebs/id.csv
-cat aws/cluster/cluster_name.csv > aws-openebs/cluster_name.csv
-cp aws/.kube/config aws-openebs/
-
-for i in efk-vars.yml efk.yml get_url.yml; do
-  wget https://raw.githubusercontent.com/openebs/e2e-infrastructure/master/production/efk-client/playbook/$i
-done
-
-echo "EFK: Deploying Aggregrator and Forwarder on client"
-ansible-playbook efk.yml --extra-vars "commit_id=$CI_COMMIT_SHA pipeline_id=$CI_PIPELINE_ID" 
+ 
+mkdir ~/.kube
+cp  aws-openebs/config ~/.kube/config
+cp -r aws-openebs/ssh/. ~/.ssh/
 
 ## Clone the litmus repo, checkout the e2e branch, navigate to litmus root 
 
-git clone https://github.com/atulabhi/litmus.git
-cd litmus; git checkout v0.7-RC1
+#git clone https://github.com/atulabhi/litmus.git
+#cd litmus; git checkout v0.7-RC1
+
+git clone https://github.com/openebs/litmus.git
+cd litmus
 
 task_delimiter;
 
@@ -71,20 +62,23 @@ task_delimiter;
 ## LITMUS PRECONDITIONING ##
 ############################
 
-## TODO: Add logic to replace job ENV based on run instance intent 
+## TODO: Add logic to replace job ENV (SC, PVC, LABEL, NS) based on run instance intent 
 ## TODO: Add logic to add ENV for run_instance_metadata/RunID
 
 #################
 ## RUNNER MAIN ##
 #################
 
-echo "Running litmus test for openebs deploy.."
+echo "Running the litmus test.."
 
-jobNameCmd="kubectl get jobs -n litmus --no-headers -o jsonpath='{.items[?(@.metadata.labels.provider==\"openebs-setup\")].metadata.name}'"
+## Create the litmus job for cassandra app deploy
 
-job_deploy_out=$(kubectl create -f providers/openebs/installers/operator/master/litmusbook/openebs_setup.yaml) && \
+jobNameCmd="kubectl get jobs -n litmus --no-headers -o jsonpath='{.items[?(@.metadata.labels.app==\"cassandra-deployment-litmus\")].metadata.name}'"
+
+job_deploy_out=$(kubectl create -f apps/cassandra/deployers/run_litmus_test.yml) && \
 job_name=$(eval $jobNameCmd); retcode=$?
 error_handler $retcode msg="Unable to run litmusbook, exiting" action="exit"
+
 
 ## Obtain the litmus pod name 
 
@@ -102,8 +96,8 @@ jobStateCmd="kubectl get pod ${litmus_pod} --no-headers -n litmus -o custom-colu
 ## TODO: Consider cases where litmus pod is evicted
 
 while [[ ! $(eval $containerStateCmd) =~ 'terminated' ]]; do
-  sleep 1
-done
+  sleep 1 
+done 
 
 while [[ $(eval $jobStateCmd) =~ 'Running' ]]; do
    sleep 1
@@ -115,16 +109,15 @@ task_delimiter;
 ## Printing the test logs & cluster state for debug purposes 
 
 echo "Dumping Litmus test pod logs for debug"; echo ""
-kubectl logs $litmus_pod -n litmus -c ansibletest
-task_delimiter;
+kubectl logs $litmus_pod -n litmus -c ansibletest 
+task_delimiter; 
 
 echo "Dumping state of cluster post job run"; echo ""
 kubectl get pods --all-namespaces
 kubectl get pvc --all-namespaces
-kubectl get sc 
+kubectl get sc
 
-task_delimiter;
-
+task_delimiter; 
 
 ## Check the test status & result from the litmus result custom resource
 
@@ -135,11 +128,11 @@ error_handler $retcode msg="Unable to find litmus result custom resource, exitin
 if [[ $testStatus == "completed" ]]; then
   if [[ $testResult == "Pass" ]]; then
     echo "TEST: PASS"
-  else
-    echo "TEST: FAILED"; exit 1
+  else 
+    echo "TEST: FAILED"; exit 1 
   fi
 else
-  echo "Test Execution was aborted"; exit 1
-fi
+  echo "Test Execution was aborted"; exit 1 
+fi 
 
 
