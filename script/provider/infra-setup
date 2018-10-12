@@ -6,7 +6,17 @@ set -ex
 ######################
 
 ## TODO: Ideally, run_metadata should be passed as gitlab runner (CI runtime) ENV
-run_metadata=""
+
+#clone e2e-infrastructre to get the latest commits and run env-exporter script from env
+git clone https://github.com/openebs/e2e-infrastructure.git
+
+cd e2e-infrastructure/env
+
+export OPENEBS_IO_JIVA_CONTROLLER_IMAGE=$(eval python env_exporter.py -o jcontroller)
+
+export OPENEBS_IO_JIVA_REPLICA_IMAGE=$(eval python env_exporter.py -o jreplica)
+
+
 
 ## https://github.com/openebs/litmus/blob/master/apps/percona/deployers/test_vars.yml
 test_name="openebsinstaller"
@@ -67,6 +77,14 @@ ansible-playbook efk.yml --extra-vars "commit_id=$CI_COMMIT_SHA pipeline_id=$CI_
 
 git clone https://github.com/openebs/litmus.git
 cd litmus
+
+#update openebs litmus job
+wget https://raw.githubusercontent.com/openebs/e2e-infrastructure/master/env-update/env.py
+python env.py -f providers/openebs/installers/operator/master/litmusbook/openebs_setup.yaml
+
+echo "########################################################################################"
+cat providers/openebs/installers/operator/master/litmusbook/openebs_setup.yaml
+echo "########################################################################################"
 
 task_delimiter;
 
