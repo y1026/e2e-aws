@@ -156,6 +156,10 @@ volume-data-integrity-{fio-jiva}:
   script:
    - ./script/apps/fio/tests/jiva/fio-volume-data-integrity-check
 
+volume-memory-consumption-{memleak-jiva}:
+  extends: .func_test_template #dependencies: jenkins-jiva
+  script:
+   - ./script/apps/memleak/tests/jiva/memory-consumption
 ## Define job template for chaos jobs 
 
 .chaos_test_template:
