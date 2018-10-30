@@ -23,7 +23,7 @@ ansible-playbook pre-requisite.yml -v
 
 # ----------------------------- Creating AWS Cluster -------------------
 echo "creating  AWS cluster"
-ansible-playbook create-aws-cluster.yml --extra-vars "k8s_version=1.10.0" -v
+ansible-playbook create-aws-cluster.yml --extra-vars "k8s_version=1.10.0 taint_value=run=litmuspod:NoSchedule" -v
 
 # ------------------- Applying rbac.yml of litmus ---------------------
 wget https://raw.githubusercontent.com/openebs/litmus/master/hack/rbac.yaml
@@ -32,6 +32,7 @@ kubectl apply -f rbac.yaml
 # --------------------- Preparing for gitlab artifact ------------------
 cat /tmp/aws/cluster_name.csv >/openebs/e2e-aws/aws/cluster/cluster_name.csv
 cat /tmp/aws/id.csv > /openebs/e2e-aws/aws/cluster/id.csv
+cat /tmp/aws/node_property > /openebs/e2e-aws/aws/cluster/node_property
 mkdir /openebs/e2e-aws/aws/.kube
 cat ~/.kube/config > /openebs/e2e-aws/aws/.kube/admin.conf
 cat ~/.kube/config > /openebs/e2e-aws/aws/.kube/config

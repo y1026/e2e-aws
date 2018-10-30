@@ -65,6 +65,7 @@ mkdir -p aws-openebs/ssh
 
 cat aws/cluster/id.csv > aws-openebs/id.csv
 cat aws/cluster/cluster_name.csv > aws-openebs/cluster_name.csv
+cat aws/cluster/node_property > aws-openebs/node_property
 cp aws/.kube/config aws-openebs/
 
 for i in efk-vars.yml efk.yml get_url.yml; do
