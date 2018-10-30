@@ -9,7 +9,7 @@ set -x
 run_metadata=""
 
 ## https://github.com/openebs/litmus/blob/master/apps/percona/functional/k8s_snapshot/test_vars.yml
-test_name="snapshot-clone-creation" 
+test_name="create-k8s-snapshot-clone" 
 
 if [[ -n "$run_metadata" ]]; then
   test_name="$test_name-$run_metadata"
