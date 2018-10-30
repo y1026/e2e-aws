@@ -23,7 +23,7 @@ present_dir=$(pwd)
 
 
 ## https://github.com/openebs/litmus/blob/master/apps/percona/deployers/test_vars.yml
-test_name="openebsinstaller"
+test_name="openebs-sc-installer"
 
 if [[ -n "$run_metadata" ]]; then
   test_name="$test_name-$run_metadata"
@@ -60,12 +60,12 @@ printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' "%"
 echo "Setting up test dependencies.."
 
 # TODO - Investigate need another folder called aws-openebs
-mkdir ~/.kube; cp  aws/.kube/config ~/.kube/config
-mkdir -p aws-openebs/ssh
+#mkdir ~/.kube; cp  aws/.kube/config ~/.kube/config
+#mkdir -p aws-openebs/ssh
 
-cat aws/cluster/id.csv > aws-openebs/id.csv
-cat aws/cluster/cluster_name.csv > aws-openebs/cluster_name.csv
-cp aws/.kube/config aws-openebs/
+#cat aws/cluster/id.csv > aws-openebs/id.csv
+#cat aws/cluster/cluster_name.csv > aws-openebs/cluster_name.csv
+#cp aws/.kube/config aws-openebs/
 
 #for i in efk-vars.yml efk.yml get_url.yml; do
 #  wget https://raw.githubusercontent.com/openebs/e2e-infrastructure/master/production/efk-client/playbook/$i
