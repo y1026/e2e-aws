@@ -1,54 +1,42 @@
 #!/bin/bash
-set -ex
+set -x
 
-######################
-##   ENVIRONMENT    ##
-######################
+#################
+## ENVIRONMENT ##
+#################
 
 ## TODO: Ideally, run_metadata should be passed as gitlab runner (CI runtime) ENV
 run_metadata=""
-present_dir=$(pwd)
-#clone e2e-infrastructre to get the latest commits and run env-exporter script from env
-git clone https://github.com/openebs/e2e-infrastructure.git
-cd e2e-infrastructure/env
-##exporting jiva-controller-image as env##
-export OPENEBS_IO_JIVA_CONTROLLER_IMAGE=$(eval python env_exporter.py -o jcontroller -fp ../baseline/baseline)
-##exporting jiva-replica-image as env##
-export OPENEBS_IO_JIVA_REPLICA_IMAGE=$(eval python env_exporter.py -o jreplica -fp ../baseline/baseline)
-##exporting m-apiserver as env##
-export MAYA_APISERVER_IMAGE=$(eval python env_exporter.py -o mapi -fp ../baseline/baseline)
-##exporting maya-volume-exporter as env##
-export OPENEBS_IO_VOLUME_MONITOR_IMAGE=$(eval python env_exporter.py -o iovolume -fp ../baseline/baseline)
-cd $present_dir
 
-
-## https://github.com/openebs/litmus/blob/master/apps/percona/deployers/test_vars.yml
-test_name="openebsinstaller"
+## https://github.com/openebs/litmus/blob/master/apps/percona/chaos/openebs_volume_replica_failure/test_vars.yml
+test_name="node-failure-drain" 
 
 if [[ -n "$run_metadata" ]]; then
   test_name="$test_name-$run_metadata"
-fi
-
-## Display pipeline info
-echo $CI_PIPELINE_ID; echo $CI_PIPELINE_IID; echo $CI_COMMIT_SHA
-
+fi 
+      
 ################
 ## FUNCTIONS  ##
 ################
+
 error_handler()
 {
 rc=$1; message=$(echo $2 | cut -d "=" -f 2); act=$(echo $3 | cut -d "=" -f 2)
 if [ $rc -ne 0 ]; then
   echo "$message"
   if [ "$act" == "exit" ]; then
-    exit 1
+    exit 1 
   fi
 fi
 }
+
 task_delimiter()
 {
 printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' "%"
 }
+
+nodename=$(cat /openebs/e2e-aws/aws/cluster/node_property | awk {'print $2'} | sed 's/,/ /g')
+echo $nodename
 
 ###################
 ## DEPENDENCIES  ##
@@ -58,22 +46,10 @@ printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' "%"
 ## "aws-openebs" is a shared path for the gitlab runner passed as artifact by gitlab 
 
 echo "Setting up test dependencies.."
-
-# TODO - Investigate need another folder called aws-openebs
-mkdir ~/.kube; cp  aws/.kube/config ~/.kube/config
-mkdir -p aws-openebs/ssh
-
-cat aws/cluster/id.csv > aws-openebs/id.csv
-cat aws/cluster/cluster_name.csv > aws-openebs/cluster_name.csv
-cat aws/cluster/node_property > aws-openebs/node_property
-cp aws/.kube/config aws-openebs/
-
-for i in efk-vars.yml efk.yml get_url.yml; do
-  wget https://raw.githubusercontent.com/openebs/e2e-infrastructure/master/production/efk-client/playbook/$i
-done
-
-echo "EFK: Deploying Aggregrator and Forwarder on client"
-ansible-playbook efk.yml --extra-vars "commit_id=$CI_COMMIT_SHA pipeline_id=$CI_PIPELINE_ID" 
+ 
+mkdir ~/.kube
+cp  aws-openebs/config ~/.kube/config
+cp -r aws-openebs/ssh/. ~/.ssh/
 
 ## Clone the litmus repo, checkout the e2e branch, navigate to litmus root 
 
@@ -89,27 +65,22 @@ task_delimiter;
 ## LITMUS PRECONDITIONING ##
 ############################
 
-## TODO: Add logic to replace job ENV based on run instance intent 
+## TODO: Add logic to replace job ENV (SC, PVC, LABEL, NS) based on run instance intent 
 ## TODO: Add logic to add ENV for run_instance_metadata/RunID
-
-#update openebs litmus job
-wget https://raw.githubusercontent.com/openebs/e2e-infrastructure/master/env-update/env.py # script to update openebs_setup.yaml
-python3 env.py -f providers/openebs/installers/operator/master/litmusbook/openebs_setup.yaml
-
-echo "updated yaml"
-cat providers/openebs/installers/operator/master/litmusbook/openebs_setup.yaml
-
-
 
 #################
 ## RUNNER MAIN ##
 #################
 
-echo "Running litmus test for openebs deploy.."
+echo "Running the litmus test.."
 
-jobNameCmd="kubectl get jobs -n litmus --no-headers -o jsonpath='{.items[?(@.metadata.labels.provider==\"openebs-setup\")].metadata.name}'"
+## Create the litmus job for percona-jiva app chaos test: node-failure-drain
 
-job_deploy_out=$(kubectl create -f providers/openebs/installers/operator/master/litmusbook/openebs_setup.yaml) && \
+jobNameCmd="kubectl get jobs -n litmus --no-headers -o jsonpath='{.items[?(@.metadata.labels.name==\"node-failure-drain\")].metadata.name}'"
+
+sed -i "s/test-node/$nodename/g" apps/percona/chaos/drain_node/run_litmus_test.yml
+
+job_deploy_out=$(kubectl create -f apps/percona/chaos/drain_node/run_litmus_test.yml) && \
 job_name=$(eval $jobNameCmd); retcode=$?
 error_handler $retcode msg="Unable to run litmusbook, exiting" action="exit"
 
@@ -129,8 +100,8 @@ jobStateCmd="kubectl get pod ${litmus_pod} --no-headers -n litmus -o custom-colu
 ## TODO: Consider cases where litmus pod is evicted
 
 while [[ ! $(eval $containerStateCmd) =~ 'terminated' ]]; do
-  sleep 1
-done
+  sleep 1 
+done 
 
 while [[ $(eval $jobStateCmd) =~ 'Running' ]]; do
    sleep 1
@@ -142,16 +113,15 @@ task_delimiter;
 ## Printing the test logs & cluster state for debug purposes 
 
 echo "Dumping Litmus test pod logs for debug"; echo ""
-kubectl logs $litmus_pod -n litmus -c ansibletest
-task_delimiter;
+kubectl logs $litmus_pod -n litmus -c ansibletest 
+task_delimiter; 
 
 echo "Dumping state of cluster post job run"; echo ""
 kubectl get pods --all-namespaces
 kubectl get pvc --all-namespaces
-kubectl get sc 
+kubectl get sc
 
-task_delimiter;
-
+task_delimiter; 
 
 ## Check the test status & result from the litmus result custom resource
 
@@ -162,11 +132,11 @@ error_handler $retcode msg="Unable to find litmus result custom resource, exitin
 if [[ $testStatus == "completed" ]]; then
   if [[ $testResult == "Pass" ]]; then
     echo "TEST: PASS"
-  else
-    echo "TEST: FAILED"; exit 1
+  else 
+    echo "TEST: FAILED"; exit 1 
   fi
 else
-  echo "Test Execution was aborted"; exit 1
-fi
+  echo "Test Execution was aborted"; exit 1 
+fi 
 
 
